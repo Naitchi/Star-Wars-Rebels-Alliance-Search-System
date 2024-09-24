@@ -70,6 +70,8 @@ export default function FilmsPage() {
   //   console.log(state);
   // };
 
+  // TODO faire des types de filtrage différent du style croissant décroissant
+
   const films: Films[] = useSelector(getFilms);
   console.log('Films from state:', films);
 
@@ -82,24 +84,10 @@ export default function FilmsPage() {
         console.log(err);
       }
     };
-    const filterTitle = (array: Films[]): Films[] => {
-      if (state.filter.title) {
-        const regex = new RegExp(state.filter.title, 'i');
-        return array.filter((item) => regex.test(item.title));
-      }
-      return array;
-    };
-    const filterDirector = (array: Films[]): Films[] => {
-      if (state.filter.director) {
-        const regex = new RegExp(state.filter.director, 'i');
-        return array.filter((item) => regex.test(item.director));
-      }
-      return array;
-    };
-    const filterProducer = (array: Films[]): Films[] => {
-      if (state.filter.producer) {
-        const regex = new RegExp(state.filter.producer, 'i');
-        return array.filter((item) => regex.test(item.producer));
+    const filterField = (field: 'title' | 'director' | 'producer', array: Films[]): Films[] => {
+      if (state.filter[field]) {
+        const regex = new RegExp(state.filter[field], 'i');
+        return array.filter((item) => regex.test(item[field]));
       }
       return array;
     };
@@ -117,7 +105,7 @@ export default function FilmsPage() {
             case '>=':
               return item.episode_id >= number;
             case '=':
-              return item.episode_id === number;
+              return item.episode_id == number;
             default:
               return false;
           }
@@ -141,7 +129,7 @@ export default function FilmsPage() {
             case '>=':
               return release_date >= date;
             case '=':
-              return release_date === date;
+              return release_date == date;
             default:
               return false;
           }
@@ -151,10 +139,10 @@ export default function FilmsPage() {
     };
     const Filter = (array: Films[]): void => {
       let filteredArray = filterDate(array);
-      filteredArray = filterDirector(filteredArray);
+      filteredArray = filterField('director', filteredArray);
       filteredArray = filterEpisode(filteredArray);
-      filteredArray = filterProducer(filteredArray);
-      filteredArray = filterTitle(filteredArray);
+      filteredArray = filterField('title', filteredArray);
+      filteredArray = filterField('producer', filteredArray);
       setState((prevState) => ({
         ...prevState,
         filteredItems: filteredArray,

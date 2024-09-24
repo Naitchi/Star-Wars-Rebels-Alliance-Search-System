@@ -41,7 +41,7 @@ export interface Films {
   opening_crawl: string;
   director: string;
   producer: string;
-  release_date: Date;
+  release_date: string;
   species: Species[];
   vehicles: Vehicle[];
   characters: People[];

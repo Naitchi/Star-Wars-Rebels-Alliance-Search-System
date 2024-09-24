@@ -15,8 +15,8 @@ const speciesSlice = createSlice({
   name: 'species',
   initialState,
   reducers: {
-    setSpecies: (state, action: PayloadAction<{ content: Species[] }>) => {
-      state.species = action.payload.content;
+    setSpecies: (state, action: PayloadAction<Species[]>) => {
+      state.species = action.payload;
     },
   },
 });

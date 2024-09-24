@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Films } from '../../types/types';
-import './CardFilms.css';
+import { Starship } from '../../types/types';
+import './CardStarship.css';
 
-export default function CardFilms(
+export default function CardStarship(
   props: Readonly<{
-    item: Films;
+    item: Starship;
   }>,
 ) {
   const extractIdFromUrl = (url: string): number => {
@@ -13,8 +13,8 @@ export default function CardFilms(
   };
 
   return (
-    <Link className="link" to={`/films/${extractIdFromUrl(props.item.url)}`}>
-      <h2>{props.item.title}</h2>
+    <Link className="link" to={`/species/${extractIdFromUrl(props.item.url)}`}>
+      <h2>{props.item.name}</h2>
     </Link>
   );
 }

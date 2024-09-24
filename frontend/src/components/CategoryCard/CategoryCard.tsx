@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './CategoryCard.css';
 
 export default function CategoryCard(
@@ -6,7 +7,7 @@ export default function CategoryCard(
   }>,
 ) {
   return (
-    <a className="link" href={`/${props.item.url}`}>
+    <Link className="link" to={`/${props.item.url}`}>
       <div
         style={{
           backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.5) 100%), url(${props.item.image})`,
@@ -18,6 +19,6 @@ export default function CategoryCard(
       >
         <h2>{props.item.name}</h2>
       </div>
-    </a>
+    </Link>
   );
 }
