@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/Card/Card';
+import Card from '../../components/CardFilms/CardFilms';
 
 // Css
 import './StarshipPage.css';
@@ -16,7 +15,6 @@ import { getStarship, setStarship } from '../../store/starshipSlice';
 
 export default function StarshipPage() {
   const dispatch = useDispatch();
-  const { name } = useParams();
   const starship: Starship[] = useSelector(getStarship);
   console.log(starship);
 
@@ -34,7 +32,7 @@ export default function StarshipPage() {
     if (!starship.length) {
       fetchItems();
     }
-  }, [dispatch, starship, name]);
+  }, [dispatch, starship]);
 
   return (
     <div className="app">

@@ -8,13 +8,14 @@ header {
     width: 80%;
     height: 150px;
 
-    background-color: #F7F7F7;
+    background-color: rgb(29, 31, 32);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 header .logo {
     width: 120px;
     height: 120px;
+    border-radius: 50%;
 }
 
 nav {
@@ -27,14 +28,14 @@ nav {
 }
 
 nav a {
-    color: #ffbf60;
+    color: #a31717;
     font-size: 24px;
     font-weight: 500;
 }
 
 nav a:hover {
     text-decoration: underline;
-    color: #ffbf60;
+    color: #a31717;
 }
 
 @media screen and (max-width: 600px) {

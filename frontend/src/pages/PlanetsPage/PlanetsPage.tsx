@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/Card/Card';
+import Card from '../../components/CardFilms/CardFilms';
 
 // Css
 import './PlanetsPage.css';
@@ -16,7 +15,6 @@ import { getPlanets, setPlanets } from '../../store/planetsSlice';
 
 export default function PlanetsPage() {
   const dispatch = useDispatch();
-  const { name } = useParams();
   const planets: Planet[] = useSelector(getPlanets);
   console.log(planets);
 
@@ -34,7 +32,7 @@ export default function PlanetsPage() {
     if (!planets.length) {
       fetchItems();
     }
-  }, [dispatch, planets, name]);
+  }, [dispatch, planets]);
 
   return (
     <div className="app">

@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/Card/Card';
+import Card from '../../components/CardFilms/CardFilms';
 
 // Css
 import './SpeciesPage.css';
@@ -16,7 +15,6 @@ import { getSpecies, setSpecies } from '../../store/speciesSlice';
 
 export default function SpeciesPage() {
   const dispatch = useDispatch();
-  const { name } = useParams();
   const species: Species[] = useSelector(getSpecies);
   console.log(species);
 
@@ -34,7 +32,7 @@ export default function SpeciesPage() {
     if (!species.length) {
       fetchItems();
     }
-  }, [dispatch, species, name]);
+  }, [dispatch, species]);
 
   return (
     <div className="app">

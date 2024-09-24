@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/Card/Card';
+import Card from '../../components/CardFilms/CardFilms';
 
 // Css
 import './PeoplePage.css';
@@ -16,7 +15,6 @@ import { People } from '../../types/types';
 
 export default function PeoplePage() {
   const dispatch = useDispatch();
-  const { name } = useParams();
   const people: People[] = useSelector(getPeople);
   console.log(people);
 
@@ -34,7 +32,7 @@ export default function PeoplePage() {
     if (!people.length) {
       fetchItems();
     }
-  }, [dispatch, people, name]);
+  }, [dispatch, people]);
 
   return (
     <div className="app">

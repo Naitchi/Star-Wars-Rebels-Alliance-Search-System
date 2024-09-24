@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/Card/Card';
+import Card from '../../components/CardFilms/CardFilms';
 
 // Css
 import './VehiclesPage.css';
@@ -17,7 +16,6 @@ import { Vehicle } from '../../types/types';
 
 export default function VehiclesPage() {
   const dispatch = useDispatch();
-  const { name } = useParams();
   const vehicles: Vehicle[] = useSelector(getVehicles);
   console.log(vehicles);
 
@@ -35,7 +33,7 @@ export default function VehiclesPage() {
     if (!vehicles.length) {
       fetchItems();
     }
-  }, [dispatch, vehicles, name]);
+  }, [dispatch, vehicles]);
 
   return (
     <div className="app">
