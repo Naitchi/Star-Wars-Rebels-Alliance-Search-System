@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
-import CardSpecies from '../../components/CardSpecies/CardSpecies';
+import Card from '../../components/Card/Card';
+import OtherInputField from '../../components/OtherInputField/OtherInputField';
+import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
-import './SpeciesPage.css';
+import style from './SpeciesPage.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,7 +16,10 @@ import { getSpecies, setSpecies } from '../../store/speciesSlice';
 import { getAll } from '../../services/data.service';
 import { Species } from '../../types/types';
 
+type OrderBy = { field: 'name' | 'average_lifespan' | 'average_height' | null; order: boolean };
+
 type StateType = {
+  orderBy: OrderBy;
   filter: {
     name: string;
     classification: string;
@@ -32,7 +37,9 @@ type StateType = {
 
 export default function SpeciesPage() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
+    orderBy: { field: null, order: true },
     filter: {
       name: '',
       classification: '',
@@ -48,10 +55,10 @@ export default function SpeciesPage() {
     filteredItems: [],
   });
 
-  const handleChange = (champ: string, value: string) => {
+  const handleTextChange = (champ: string, value: string) => {
     setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
   };
-  const handleFilterChange = (
+  const handleOtherInputChange = (
     champ: 'average_height' | 'average_lifespan',
     key: 'average_height' | 'average_lifespan' | 'operateur',
     value: string,
@@ -62,29 +69,38 @@ export default function SpeciesPage() {
         ...prevState.filter,
         [champ]: {
           ...prevState.filter[champ],
-          [key]: value, // Mettre à jour la clé spécifiée sous le champ principal
+          [key]: value,
         },
       },
     }));
   };
-
-  const logState = () => {
-    console.log(state);
+  const handleOrderChange = (orderBy: OrderBy) => {
+    setState((prevState) => ({
+      ...prevState,
+      orderBy: orderBy,
+    }));
   };
 
   const species: Species[] = useSelector(getSpecies);
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await getAll('species');
-        dispatch(setSpecies(response));
+        dispatch(setSpecies(response as Species[]));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading(false);
     };
 
-    const filterField = (
+    if (!species.length) fetchItems();
+    else setIsLoading(false);
+  }, [dispatch, species]);
+
+  useEffect(() => {
+    const filterTextField = (
       field:
         | 'name'
         | 'classification'
@@ -103,15 +119,15 @@ export default function SpeciesPage() {
       return array;
     };
     const filterByNumberField = (
-      array: Species[],
       field: keyof Species,
       operateur: string,
-      value: number | string,
+      value: number | string | undefined,
+      array: Species[],
     ): Species[] => {
-      const numberValue = Number(value);
-      if (!numberValue) {
+      if (!value) {
         return array;
       }
+      const numberValue = Number(value);
       return array.filter((item) => {
         const itemValue = Number(item[field]);
         switch (operateur) {
@@ -130,48 +146,42 @@ export default function SpeciesPage() {
         }
       });
     };
+    const sortArray = (
+      array: Species[],
+      order: boolean,
+      field: 'name' | 'average_lifespan' | 'average_height',
+    ): Species[] => {
+      const sortedArray = [...array];
+      if (order)
+        return sortedArray.sort((a, b) => String(a[field]).localeCompare(String(b[field])));
+      return sortedArray.sort((a, b) => String(b[field]).localeCompare(String(a[field])));
+    };
     const Filter = (array: Species[]): void => {
-      console.log('1', array);
+      const filter = state.filter;
+      const orderBy = state.orderBy;
 
-      let filteredArray = filterField('name', array);
-      console.log('2', filteredArray);
+      let filteredArray = filterTextField('name', array);
+      filteredArray = filterTextField('classification', filteredArray);
+      filteredArray = filterTextField('designation', filteredArray);
 
-      filteredArray = filterField('classification', filteredArray);
-      console.log('3', filteredArray);
-
-      filteredArray = filterField('designation', filteredArray);
-      console.log('4', filteredArray);
-
-      filteredArray = filterField('eye_colors', filteredArray);
-      console.log('5', filteredArray);
-
-      filteredArray = filterField('hair_colors', filteredArray);
-      console.log('6', filteredArray);
-
-      filteredArray = filterField('skin_colors', filteredArray);
-      console.log('7', filteredArray);
-
-      filteredArray = filterField('language', filteredArray);
-      console.log('8', filteredArray);
-
-      filteredArray = filterField('homeworld', filteredArray);
-      console.log('9', filteredArray);
-
+      filteredArray = filterTextField('eye_colors', filteredArray);
+      filteredArray = filterTextField('hair_colors', filteredArray);
+      filteredArray = filterTextField('skin_colors', filteredArray);
+      filteredArray = filterTextField('language', filteredArray);
+      filteredArray = filterTextField('homeworld', filteredArray);
       filteredArray = filterByNumberField(
-        filteredArray,
         'average_height',
-        state.filter.average_height.operateur,
-        state.filter.average_height.average_height,
-      );
-      console.log('10', filteredArray);
-
-      filteredArray = filterByNumberField(
+        filter.average_height.operateur,
+        filter.average_height.average_height,
         filteredArray,
-        'average_lifespan',
-        state.filter.average_lifespan.operateur,
-        state.filter.average_lifespan.average_lifespan,
       );
-      console.log('11', filteredArray);
+      filteredArray = filterByNumberField(
+        'average_lifespan',
+        filter.average_lifespan.operateur,
+        filter.average_lifespan.average_lifespan,
+        filteredArray,
+      );
+      if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
 
       setState((prevState) => ({
         ...prevState,
@@ -179,159 +189,131 @@ export default function SpeciesPage() {
       }));
     };
 
-    if (!species.length) {
-      fetchItems();
-    }
-    Filter(species);
-  }, [dispatch, state.filter, species]);
+    if (species.length) Filter(species);
+  }, [state.orderBy, state.filter, species]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      <button onClick={() => logState()}>Log State</button>
-      <div className="filterContainer">
-        <div>
-          <button onClick={() => handleChange('name', '')}>X</button>
-          <label htmlFor="name">Name:</label>
-          <input
-            value={state.filter.name}
-            type="text"
-            id="name"
-            onChange={(e) => handleChange('name', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('classification', '')}>X</button>
-          <label htmlFor="classification">Classification:</label>
-          <input
-            value={state.filter.classification}
-            type="text"
-            id="classification"
-            onChange={(e) => handleChange('classification', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('designation', '')}>X</button>
-          <label htmlFor="designation">Designation:</label>
-          <input
-            value={state.filter.designation}
-            type="text"
-            id="designation"
-            onChange={(e) => handleChange('designation', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('eye_colors', '')}>X</button>
-          <label htmlFor="eye_colors">Eye Colors:</label>
-          <input
-            value={state.filter.eye_colors}
-            type="text"
-            id="eye_colors"
-            onChange={(e) => handleChange('eye_colors', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('hair_colors', '')}>X</button>
-          <label htmlFor="hair_colors">Hair Colors:</label>
-          <input
-            value={state.filter.hair_colors}
-            type="text"
-            id="hair_colors"
-            onChange={(e) => handleChange('hair_colors', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('skin_colors', '')}>X</button>
-          <label htmlFor="skin_colors">Skin Colors:</label>
-          <input
-            value={state.filter.skin_colors}
-            type="text"
-            id="skin_colors"
-            onChange={(e) => handleChange('skin_colors', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('language', '')}>X</button>
-          <label htmlFor="language">Language:</label>
-          <input
-            value={state.filter.language}
-            type="text"
-            id="language"
-            onChange={(e) => handleChange('language', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('homeworld', '')}>X</button>
-          <label htmlFor="homeworld">Homeworld:</label>
-          <input
-            value={state.filter.homeworld}
-            type="text"
-            id="homeworld"
-            onChange={(e) => handleChange('homeworld', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('average_lifespan', 'average_lifespan', '')}>
-            X
-          </button>
-          <label htmlFor="average_lifespan">Average Lifespan:</label>
-          <select
-            value={state.filter.average_lifespan.operateur}
-            onChange={(e) => handleFilterChange('average_lifespan', 'operateur', e.target.value)}
-            name="operateur"
-            id="average_lifespan"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="average_lifespan"
-            min={0}
-            value={state.filter.average_lifespan.average_lifespan}
-            onChange={(e) =>
-              handleFilterChange('average_lifespan', 'average_lifespan', e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('average_height', 'average_height', '')}>
-            X
-          </button>
-          <label htmlFor="average_height">Average Height:</label>
-          <select
-            value={state.filter.average_height.operateur}
-            onChange={(e) => handleFilterChange('average_height', 'operateur', e.target.value)}
-            name="operateur"
-            id="average_height"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="average_height"
-            min={0}
-            value={state.filter.average_height.average_height}
-            onChange={(e) => handleFilterChange('average_height', 'average_height', e.target.value)}
-          />
-        </div>
+      <div className={style.filterContainer}>
+        <TextInputField
+          label="Name"
+          name="name"
+          value={state.filter.name}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'name')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'name', order: true });
+          }}
+          onChange={(e) => handleTextChange('name', e.target.value)}
+          onClear={() => handleTextChange('name', '')}
+          placeholder="Ex: Human"
+        />
+        <TextInputField
+          label="Classification"
+          name="classification"
+          value={state.filter.classification}
+          onChange={(e) => handleTextChange('classification', e.target.value)}
+          onClear={() => handleTextChange('classification', '')}
+          placeholder="Ex: A" // TODO mettre un truc mieux
+        />
+        <TextInputField
+          label="Designation"
+          name="designation"
+          value={state.filter.designation}
+          onChange={(e) => handleTextChange('designation', e.target.value)}
+          onClear={() => handleTextChange('designation', '')}
+          placeholder="Ex: A " // TODO mettre un truc mieux
+        />
+        <TextInputField
+          label="Eye Colors"
+          name="eye_colors"
+          value={state.filter.eye_colors}
+          onChange={(e) => handleTextChange('eye_colors', e.target.value)}
+          onClear={() => handleTextChange('eye_colors', '')}
+          placeholder="Ex: blue"
+        />
+        <TextInputField
+          label="Hair Colors"
+          name="hair_colors"
+          value={state.filter.hair_colors}
+          onChange={(e) => handleTextChange('hair_colors', e.target.value)}
+          onClear={() => handleTextChange('hair_colors', '')}
+          placeholder="Ex: brown"
+        />
+        <TextInputField
+          label="Skin Colors"
+          name="skin_colors"
+          value={state.filter.skin_colors}
+          onChange={(e) => handleTextChange('skin_colors', e.target.value)}
+          onClear={() => handleTextChange('skin_colors', '')}
+          placeholder="Ex: white"
+        />
+        <TextInputField
+          label="Language"
+          name="language"
+          value={state.filter.language}
+          onChange={(e) => handleTextChange('language', e.target.value)}
+          onClear={() => handleTextChange('language', '')}
+          placeholder="Ex: " // TODO mettre un truc mieux
+        />
+        <TextInputField
+          label="Homeworld"
+          name="homeworld"
+          value={state.filter.homeworld}
+          onChange={(e) => handleTextChange('homeworld', e.target.value)}
+          onClear={() => handleTextChange('homeworld', '')}
+          placeholder="Ex: " // TODO mettre un truc mieux
+        />
+        <OtherInputField
+          label="Average Lifespan"
+          name="average_lifespan"
+          operateur={state.filter.average_lifespan.operateur}
+          value={state.filter.average_lifespan.average_lifespan}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'average_lifespan')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'average_lifespan', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('average_lifespan', 'operateur', e.target.value)
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange('average_lifespan', 'average_lifespan', e.target.value)
+          }
+          onClear={() => handleOtherInputChange('average_lifespan', 'average_lifespan', '')}
+        />
+        <OtherInputField
+          label="Average Height"
+          name="average_height"
+          operateur={state.filter.average_height.operateur}
+          value={state.filter.average_height.average_height}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'average_height')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'average_height', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('average_height', 'operateur', e.target.value)
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange('average_height', 'average_height', e.target.value)
+          }
+          onClear={() => handleOtherInputChange('average_height', 'average_height', '')}
+        />
       </div>
-      <div className="container">
+      <div className={style.container}>
         <h1>The Species:</h1>
-        {state.filteredItems.map((item, index) => (
-          <CardSpecies key={index} item={item} />
-        ))}
+        {isLoading ? (
+          <p>Chargement...</p>
+        ) : (
+          state.filteredItems.map((item) => <Card key={item.name} item={item} />)
+        )}
       </div>
     </div>
   );

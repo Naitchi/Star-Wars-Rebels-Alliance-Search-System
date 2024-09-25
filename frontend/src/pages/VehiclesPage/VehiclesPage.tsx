@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
-import CardVehicle from '../../components/CardVehicle/CardVehicle';
+import Card from '../../components/Card/Card';
+import OtherInputField from '../../components/OtherInputField/OtherInputField';
+import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
-import './VehiclePage.css';
+import style from './VehiclesPage.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,7 +16,22 @@ import { getVehicles, setVehicles } from '../../store/vehiclesSlice';
 import { getAll } from '../../services/data.service';
 import { Vehicle } from '../../types/types';
 
+type OrderBy = {
+  field:
+    | 'name'
+    | 'vehicle_class'
+    | 'cost_in_credits'
+    | 'length'
+    | 'crew'
+    | 'passengers'
+    | 'max_atmosphering_speed'
+    | 'cargo_capacity'
+    | null;
+  order: boolean;
+};
+
 type StateType = {
+  orderBy: OrderBy;
   filter: {
     name: string;
     model: string;
@@ -25,8 +42,6 @@ type StateType = {
     crew: string;
     passengers: { passengers: string; operateur: string };
     max_atmosphering_speed: { max_atmosphering_speed: string; operateur: string };
-    hyperdrive_rating: { hyperdrive_rating: string; operateur: string };
-    MGLT: { MGLT: string; operateur: string };
     cargo_capacity: { cargo_capacity: string; operateur: string };
     consumables: { consumables: string; operateur: string };
   };
@@ -35,7 +50,9 @@ type StateType = {
 
 export default function VehiclePage() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
+    orderBy: { field: null, order: true },
     filter: {
       name: '',
       model: '',
@@ -46,15 +63,13 @@ export default function VehiclePage() {
       crew: '',
       passengers: { passengers: '', operateur: '<' },
       max_atmosphering_speed: { max_atmosphering_speed: '', operateur: '<' },
-      hyperdrive_rating: { hyperdrive_rating: '', operateur: '<' },
-      MGLT: { MGLT: '', operateur: '<' },
       cargo_capacity: { cargo_capacity: '', operateur: '<' },
       consumables: { consumables: '', operateur: '<' },
     },
     filteredItems: [],
   });
 
-  const handleChange = (champ: string, value: string) => {
+  const handleTextChange = (champ: string, value: string) => {
     setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
   };
   type objet =
@@ -62,43 +77,50 @@ export default function VehiclePage() {
     | 'length'
     | 'passengers'
     | 'max_atmosphering_speed'
-    | 'hyperdrive_rating'
-    | 'MGLT'
     | 'cargo_capacity'
     | 'consumables'; // TODO refaire ça marche pas
 
   type field = 'name' | 'model' | 'vehicle_class' | 'manufacturer' | 'crew';
 
-  const handleFilterChange = (champ: objet, key: objet | 'operateur', value: string) => {
+  const handleOtherInputChange = (champ: objet, key: objet | 'operateur', value: string) => {
     setState((prevState) => ({
       ...prevState,
       filter: {
         ...prevState.filter,
         [champ]: {
           ...prevState.filter[champ],
-          [key]: value, // Mettre à jour la clé spécifiée sous le champ principal
+          [key]: value,
         },
       },
     }));
   };
-
-  const logState = () => {
-    console.log(state);
+  const handleOrderChange = (orderBy: OrderBy) => {
+    setState((prevState) => ({
+      ...prevState,
+      orderBy: orderBy,
+    }));
   };
 
   const vehicles: Vehicle[] = useSelector(getVehicles);
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
-        const response = await getAll('vehicle');
-        dispatch(setVehicles(response));
+        const response = await getAll('vehicles');
+        dispatch(setVehicles(response as Vehicle[]));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading(false);
     };
 
-    const filterField = (field: field, array: Vehicle[]): Vehicle[] => {
+    if (!vehicles.length) fetchItems();
+    else setIsLoading(false);
+  }, [dispatch, vehicles]);
+
+  useEffect(() => {
+    const filterTextField = (field: field, array: Vehicle[]): Vehicle[] => {
       if (state.filter[field]) {
         const regex = new RegExp(state.filter[field], 'i');
         return array.filter((item) => regex.test(item[field]));
@@ -106,15 +128,15 @@ export default function VehiclePage() {
       return array;
     };
     const filterByNumberField = (
-      array: Vehicle[],
       field: keyof Vehicle,
       operateur: string,
-      value: number | string,
+      value: number | string | undefined,
+      array: Vehicle[],
     ): Vehicle[] => {
-      const numberValue = Number(value);
-      if (!numberValue) {
+      if (!value) {
         return array;
       }
+      const numberValue = Number(value);
       return array.filter((item) => {
         const itemValue = Number(item[field]);
         switch (operateur) {
@@ -133,354 +155,266 @@ export default function VehiclePage() {
         }
       });
     };
+    const sortArray = (
+      array: Vehicle[],
+      order: boolean,
+      field:
+        | 'name'
+        | 'vehicle_class'
+        | 'cost_in_credits'
+        | 'length'
+        | 'crew'
+        | 'passengers'
+        | 'max_atmosphering_speed'
+        | 'cargo_capacity',
+    ): Vehicle[] => {
+      const sortedArray = [...array];
+      if (order)
+        return sortedArray.sort((a, b) => String(a[field]).localeCompare(String(b[field])));
+      return sortedArray.sort((a, b) => String(b[field]).localeCompare(String(a[field])));
+    };
     const Filter = (array: Vehicle[]): void => {
-      let filteredArray = filterField('name', array);
-      filteredArray = filterField('model', filteredArray);
-      filteredArray = filterField('vehicle_class', filteredArray);
-      filteredArray = filterField('manufacturer', filteredArray);
-      filteredArray = filterField('crew', filteredArray); // TODO refaire un filter pour le crew et on split les -
+      const filter = state.filter;
+      const orderBy = state.orderBy;
+
+      let filteredArray = filterTextField('name', array);
+      filteredArray = filterTextField('model', filteredArray);
+      filteredArray = filterTextField('vehicle_class', filteredArray);
+      filteredArray = filterTextField('manufacturer', filteredArray);
+      filteredArray = filterTextField('crew', filteredArray); // TODO refaire un filter pour le crew et on split les -
       filteredArray = filterByNumberField(
-        filteredArray,
         'cost_in_credits',
-        state.filter.cost_in_credits.operateur,
-        state.filter.cost_in_credits.cost_in_credits,
+        filter.cost_in_credits.operateur,
+        filter.cost_in_credits.cost_in_credits,
+        filteredArray,
       );
       filteredArray = filterByNumberField(
-        filteredArray,
         'length',
-        state.filter.length.operateur,
-        state.filter.length.length,
+        filter.length.operateur,
+        filter.length.length,
+        filteredArray,
       );
       filteredArray = filterByNumberField(
-        filteredArray,
         'passengers',
-        state.filter.passengers.operateur,
-        state.filter.passengers.passengers,
+        filter.passengers.operateur,
+        filter.passengers.passengers,
+        filteredArray,
       );
       filteredArray = filterByNumberField(
-        filteredArray,
         'max_atmosphering_speed',
-        state.filter.max_atmosphering_speed.operateur,
-        state.filter.max_atmosphering_speed.max_atmosphering_speed,
+        filter.max_atmosphering_speed.operateur,
+        filter.max_atmosphering_speed.max_atmosphering_speed,
+        filteredArray,
       );
       filteredArray = filterByNumberField(
-        filteredArray,
-        'hyperdrive_rating',
-        state.filter.hyperdrive_rating.operateur,
-        state.filter.hyperdrive_rating.hyperdrive_rating,
-      );
-      filteredArray = filterByNumberField(
-        filteredArray,
-        'MGLT',
-        state.filter.MGLT.operateur,
-        state.filter.MGLT.MGLT,
-      );
-      filteredArray = filterByNumberField(
-        filteredArray,
         'cargo_capacity',
-        state.filter.cargo_capacity.operateur,
-        state.filter.cargo_capacity.cargo_capacity,
+        filter.cargo_capacity.operateur,
+        filter.cargo_capacity.cargo_capacity,
+        filteredArray,
       );
       filteredArray = filterByNumberField(
-        filteredArray,
         'consumables',
-        state.filter.consumables.operateur,
-        state.filter.consumables.consumables,
+        filter.consumables.operateur,
+        filter.consumables.consumables,
+        filteredArray,
       );
+      if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
+
       setState((prevState) => ({
         ...prevState,
         filteredItems: filteredArray,
       }));
     };
 
-    if (!vehicles.length) {
-      fetchItems();
-    }
-    Filter(vehicles);
-  }, [dispatch, state.filter, vehicles]);
+    if (vehicles.length) Filter(vehicles);
+  }, [state.orderBy, state.filter, vehicles]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      <button onClick={() => logState()}>Log State</button>
-      <div className="filterContainer">
-        <div>
-          <button onClick={() => handleChange('name', '')}>X</button>
-          <label htmlFor="name">Name:</label>
-          <input
-            value={state.filter.name}
-            type="text"
-            id="name"
-            onChange={(e) => handleChange('name', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('model', '')}>X</button>
-          <label htmlFor="model">Model:</label>
-          <input
-            value={state.filter.model}
-            type="text"
-            id="model"
-            onChange={(e) => handleChange('model', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('vehicle_class', '')}>X</button>
-          <label htmlFor="vehicle_class">Vehicle Class:</label>
-          <input
-            value={state.filter.vehicle_class}
-            type="text"
-            id="vehicle_class"
-            onChange={(e) => handleChange('vehicle_class', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('manufacturer', '')}>X</button>
-          <label htmlFor="manufacturer">Manufacturer:</label>
-          <input
-            value={state.filter.manufacturer}
-            type="text"
-            id="manufacturer"
-            onChange={(e) => handleChange('manufacturer', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('crew', '')}>X</button>
-          <label htmlFor="crew">Crew:</label>
-          <input
-            value={state.filter.crew}
-            type="text"
-            id="crew"
-            onChange={(e) => handleChange('crew', e.target.value)}
-          />
-        </div>
-
-        <div>
-          <button onClick={() => handleFilterChange('cost_in_credits', 'cost_in_credits', '')}>
-            X
-          </button>
-          <label htmlFor="cost_in_credits">Cost in credits:</label>
-          <select
-            value={state.filter.cost_in_credits.operateur}
-            onChange={(e) => handleFilterChange('cost_in_credits', 'operateur', e.target.value)}
-            name="operateur"
-            id="cost_in_credits"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="cost_in_credits"
-            min={0}
-            value={state.filter.cost_in_credits.cost_in_credits}
-            onChange={(e) =>
-              handleFilterChange('cost_in_credits', 'cost_in_credits', e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('passengers', 'passengers', '')}>X</button>
-          <label htmlFor="passengers">Passengers</label>
-          <select
-            value={state.filter.passengers.operateur}
-            onChange={(e) => handleFilterChange('passengers', 'operateur', e.target.value)}
-            name="operateur"
-            id="passengers"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="passengers"
-            min={0}
-            value={state.filter.passengers.passengers}
-            onChange={(e) => handleFilterChange('passengers', 'passengers', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('length', 'length', '')}>X</button>
-          <label htmlFor="length">Length:</label>
-          <select
-            value={state.filter.length.operateur}
-            onChange={(e) => handleFilterChange('length', 'operateur', e.target.value)}
-            name="operateur"
-            id="length"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="length"
-            min={0}
-            value={state.filter.length.length}
-            onChange={(e) => handleFilterChange('length', 'length', e.target.value)}
-          />
-        </div>
-        <div>
-          <button
-            onClick={() =>
-              handleFilterChange('max_atmosphering_speed', 'max_atmosphering_speed', '')
-            }
-          >
-            X
-          </button>
-          <label htmlFor="max_atmosphering_speed">Max Atmosphering Speed:</label>
-          <select
-            value={state.filter.max_atmosphering_speed.operateur}
-            onChange={(e) =>
-              handleFilterChange('max_atmosphering_speed', 'operateur', e.target.value)
-            }
-            name="operateur"
-            id="max_atmosphering_speed"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="max_atmosphering_speed"
-            min={0}
-            value={state.filter.max_atmosphering_speed.max_atmosphering_speed}
-            onChange={(e) =>
-              handleFilterChange('max_atmosphering_speed', 'max_atmosphering_speed', e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('hyperdrive_rating', 'hyperdrive_rating', '')}>
-            X
-          </button>
-          <label htmlFor="hyperdrive_rating">Hyperdrive rating:</label>
-          <select
-            value={state.filter.hyperdrive_rating.operateur}
-            onChange={(e) => handleFilterChange('hyperdrive_rating', 'operateur', e.target.value)}
-            name="operateur"
-            id="hyperdrive_rating"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="hyperdrive_rating"
-            min={0}
-            value={state.filter.hyperdrive_rating.hyperdrive_rating}
-            onChange={(e) =>
-              handleFilterChange('hyperdrive_rating', 'hyperdrive_rating', e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('MGLT', 'MGLT', '')}>X</button>
-          <label htmlFor="MGLT">Megalight per hour:</label>
-          <select
-            value={state.filter.MGLT.operateur}
-            onChange={(e) => handleFilterChange('MGLT', 'operateur', e.target.value)}
-            name="operateur"
-            id="MGLT"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="MGLT"
-            min={0}
-            value={state.filter.MGLT.MGLT}
-            onChange={(e) => handleFilterChange('MGLT', 'MGLT', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('cargo_capacity', 'cargo_capacity', '')}>
-            X
-          </button>
-          <label htmlFor="cargo_capacity">Cargo capacity:</label>
-          <select
-            value={state.filter.cargo_capacity.operateur}
-            onChange={(e) => handleFilterChange('cargo_capacity', 'operateur', e.target.value)}
-            name="operateur"
-            id="cargo_capacity"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="cargo_capacity"
-            min={0}
-            value={state.filter.cargo_capacity.cargo_capacity}
-            onChange={(e) => handleFilterChange('cargo_capacity', 'cargo_capacity', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('consumables', 'consumables', '')}>X</button>
-          <label htmlFor="consumables">Consumables:</label>
-          <select
-            value={state.filter.consumables.operateur}
-            onChange={(e) => handleFilterChange('consumables', 'operateur', e.target.value)}
-            name="operateur"
-            id="consumables"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="consumables"
-            min={0}
-            value={state.filter.consumables.consumables}
-            onChange={(e) => handleFilterChange('consumables', 'consumables', e.target.value)}
-          />
-        </div>
+      <div className={style.filterContainer}>
+        <TextInputField
+          label="Name"
+          name="name"
+          value={state.filter.name}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'name')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'name', order: true });
+          }}
+          onChange={(e) => handleTextChange('name', e.target.value)}
+          onClear={() => handleTextChange('name', '')}
+          placeholder="Ex: " // TODO mettre une truc mieux
+        />
+        <TextInputField
+          label="Model"
+          name="model"
+          value={state.filter.model}
+          onChange={(e) => handleTextChange('model', e.target.value)}
+          onClear={() => handleTextChange('model', '')}
+          placeholder="Ex: " // TODO mettre une truc mieux
+        />
+        <TextInputField
+          label="Vehicle Class"
+          name="vehicle_class"
+          value={state.filter.vehicle_class}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'vehicle_class')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'vehicle_class', order: true });
+          }}
+          onChange={(e) => handleTextChange('vehicle_class', e.target.value)}
+          onClear={() => handleTextChange('vehicle_class', '')}
+          placeholder="Ex:  " // TODO mettre une truc mieux
+        />
+        <TextInputField
+          label="Manufacturer"
+          name="manufacturer"
+          value={state.filter.manufacturer}
+          onChange={(e) => handleTextChange('manufacturer', e.target.value)}
+          onClear={() => handleTextChange('manufacturer', '')}
+          placeholder="Ex: " // TODO mettre une truc mieux
+        />
+        <TextInputField
+          label="Crew"
+          name="crew"
+          value={state.filter.crew}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'crew')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'crew', order: true });
+          }}
+          onChange={(e) => handleTextChange('crew', e.target.value)}
+          onClear={() => handleTextChange('crew', '')}
+          placeholder="Ex: 1-2"
+        />
+        <OtherInputField
+          label="Cost In Credits"
+          name="cost_in_credits"
+          operateur={state.filter.cost_in_credits.operateur}
+          value={state.filter.cost_in_credits.cost_in_credits}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'cost_in_credits')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'cost_in_credits', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('cost_in_credits', 'operateur', e.target.value)
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange('cost_in_credits', 'cost_in_credits', e.target.value)
+          }
+          onClear={() => handleOtherInputChange('cost_in_credits', 'cost_in_credits', '')}
+        />
+        <OtherInputField
+          label="Passengers"
+          name="passengers"
+          operateur={state.filter.passengers.operateur}
+          value={state.filter.passengers.passengers}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'passengers')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'passengers', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('passengers', 'operateur', e.target.value)
+          }
+          onDateChange={(e) => handleOtherInputChange('passengers', 'passengers', e.target.value)}
+          onClear={() => handleOtherInputChange('passengers', 'passengers', '')}
+        />
+        <OtherInputField
+          label="Length"
+          name="length"
+          operateur={state.filter.length.operateur}
+          value={state.filter.length.length}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'length')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'length', order: true });
+          }}
+          onOperateurChange={(e) => handleOtherInputChange('length', 'operateur', e.target.value)}
+          onDateChange={(e) => handleOtherInputChange('length', 'length', e.target.value)}
+          onClear={() => handleOtherInputChange('length', 'length', '')}
+        />
+        <OtherInputField
+          label="Max Atmosphering Speed"
+          name="max_atmosphering_speed"
+          operateur={state.filter.max_atmosphering_speed.operateur}
+          value={state.filter.max_atmosphering_speed.max_atmosphering_speed}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'max_atmosphering_speed')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'max_atmosphering_speed', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange(
+              'max_atmosphering_speed',
+              'max_atmosphering_speed',
+              e.target.value,
+            )
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange(
+              'max_atmosphering_speed',
+              'max_atmosphering_speed',
+              e.target.value,
+            )
+          }
+          onClear={() =>
+            handleOtherInputChange('max_atmosphering_speed', 'max_atmosphering_speed', '')
+          }
+        />
+        <OtherInputField
+          label="Cargo Capacity"
+          name="cargo_capacity"
+          operateur={state.filter.cargo_capacity.operateur}
+          value={state.filter.cargo_capacity.cargo_capacity}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'cargo_capacity')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'cargo_capacity', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('cargo_capacity', 'operateur', e.target.value)
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange('cargo_capacity', 'cargo_capacity', e.target.value)
+          }
+          onClear={() => handleOtherInputChange('cargo_capacity', 'cargo_capacity', '')}
+        />
+        <OtherInputField
+          label="Consumables"
+          name="consumables"
+          operateur={state.filter.consumables.operateur}
+          value={state.filter.consumables.consumables}
+          type="number"
+          onOperateurChange={(e) =>
+            handleOtherInputChange('consumables', 'consumables', e.target.value)
+          }
+          onDateChange={(e) => handleOtherInputChange('consumables', 'consumables', e.target.value)}
+          onClear={() => handleOtherInputChange('consumables', 'consumables', '')}
+        />
       </div>
-      <div className="container">
+      <div className={style.container}>
         <h1>The Vehicles:</h1>
-        {state.filteredItems.map((item, index) => (
-          <CardVehicle key={index} item={item} />
-        ))}
+        {isLoading ? (
+          <p>Chargement...</p>
+        ) : (
+          state.filteredItems.map((item) => <Card key={item.name} item={item} />)
+        )}
       </div>
     </div>
   );

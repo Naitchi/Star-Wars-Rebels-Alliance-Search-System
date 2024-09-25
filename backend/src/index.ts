@@ -1,5 +1,6 @@
 import Hapi from '@hapi/hapi';
 import axios from 'axios';
+import { Items } from './types/types';
 
 const init = async () => {
   const server = Hapi.server({
@@ -23,119 +24,30 @@ const init = async () => {
 
   server.route({
     method: 'GET',
-    path: '/starship',
+    path: '/category/{name}/{id}',
     handler: async (request, h) => {
-      console.log('in getAllStarships controller');
-      const data: any = [];
-      let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/starships/';
-      while (i) {
-        const response = await axios.get(url);
-        if (response.data.next) {
-          url = response.data.next;
-        } else {
-          i = false;
-        }
-        data.push(...response.data.results);
-      }
-      return data;
+      const { name, id } = request.params;
+      if (!name || !id)
+        return h.response({ error: 'Le paramètre "name" et "id" sont requis.' }).code(400);
+
+      console.log(`in ${name} controller`);
+      const url: string = `https://swapi.dev/api/${name}/${id}`;
+      const response = await axios.get(url);
+      return response.data;
     },
   });
 
   server.route({
     method: 'GET',
-    path: '/films',
+    path: '/categories/{name}',
     handler: async (request, h) => {
-      console.log('in getAllFilms controller');
-      const data: any = [];
-      let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/films/';
-      while (i) {
-        const response = await axios.get(url);
-        if (response.data.next) {
-          url = response.data.next;
-        } else {
-          i = false;
-        }
-        data.push(...response.data.results);
-      }
-      console.log(data);
-      return data;
-    },
-  });
+      const name = request.params.name;
+      if (!name) return h.response({ error: 'Le paramètre "name" est requis.' }).code(400);
 
-  server.route({
-    method: 'GET',
-    path: '/people',
-    handler: async (request, h) => {
-      console.log('in getAllPeople  controller');
-      const data: any = [];
+      console.log(`in ${name} controller`);
+      const data: Items = [];
+      let url: string = `https://swapi.dev/api/${name}/`;
       let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/people/';
-      while (i) {
-        const response = await axios.get(url);
-        if (response.data.next) {
-          url = response.data.next;
-        } else {
-          i = false;
-        }
-        data.push(...response.data.results);
-      }
-      return data;
-    },
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/planets',
-    handler: async (request, h) => {
-      console.log('in getAllPlanets controller');
-      const data: any = [];
-      let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/planets/';
-      while (i) {
-        const response = await axios.get(url);
-        if (response.data.next) {
-          url = response.data.next;
-        } else {
-          i = false;
-        }
-        data.push(...response.data.results);
-      }
-      return data;
-    },
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/species',
-    handler: async (request, h) => {
-      console.log('in getAllSpecies controller');
-      const data: any = [];
-      let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/species/';
-      while (i) {
-        const response = await axios.get(url);
-        if (response.data.next) {
-          url = response.data.next;
-        } else {
-          i = false;
-        }
-        data.push(...response.data.results);
-      }
-      return data;
-    },
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/vehicles',
-    handler: async (request, h) => {
-      console.log('in getAllVehicles controller');
-      const data: any = [];
-      let i: boolean = true;
-      let url: string = 'https://swapi.dev/api/vehicles/';
-
       while (i) {
         const response = await axios.get(url);
         if (response.data.next) {

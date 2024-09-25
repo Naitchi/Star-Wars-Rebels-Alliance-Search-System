@@ -3,7 +3,7 @@ import Header from '../../components/Header/Header';
 import CategoryCard from '../../components/CategoryCard/CategoryCard';
 
 // Css
-import './App.css';
+import style from './App.module.css';
 
 const categories = [
   { name: 'Films', url: 'films', image: '' },
@@ -16,11 +16,11 @@ const categories = [
 
 function App() {
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      <div className="container">
-        {categories.map((item, index) => (
-          <CategoryCard key={index} item={item} />
+      <div className={style.container}>
+        {categories.map((item) => (
+          <CategoryCard key={item.name} item={item} />
         ))}
       </div>
     </div>

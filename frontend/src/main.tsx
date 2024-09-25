@@ -23,12 +23,17 @@ import './assets/css/index.css';
 
 import { Provider } from 'react-redux';
 import store from './store/index';
+import AllCategories from './pages/AllCategories/AllCategories';
 
 // Configuration des routes avec React Router
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+  },
+  {
+    path: '/all',
+    element: <AllCategories />,
   },
   {
     path: '/films',
@@ -39,11 +44,11 @@ const router = createBrowserRouter([
     element: <FilmDetailsPage />,
   },
   {
-    path: '/peoples',
+    path: '/people',
     element: <PeoplePage />,
   },
   {
-    path: '/peoples/:id',
+    path: '/people/:id',
     element: <PeopleDetailsPage />,
   },
   {

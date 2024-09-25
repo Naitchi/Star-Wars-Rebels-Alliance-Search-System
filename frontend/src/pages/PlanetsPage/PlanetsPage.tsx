@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
-import CardPlanets from '../../components/CardPlanets/CardPlanets';
+import Card from '../../components/Card/Card';
+import OtherInputField from '../../components/OtherInputField/OtherInputField';
+import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
-import './PlanetsPage.css';
+import style from './PlanetsPage.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,12 +16,15 @@ import { getPlanets, setPlanets } from '../../store/planetsSlice';
 import { getAll } from '../../services/data.service';
 import { Planet } from '../../types/types';
 
+type OrderBy = { field: 'name' | 'diameter' | 'gravity' | 'population' | null; order: boolean };
+
 type StateType = {
+  orderBy: OrderBy;
   filter: {
     name: string;
-    diameter: { diameter: string; operateur: string };
-    gravity: { gravity: string; operateur: string };
-    population: { population: string; operateur: string };
+    diameter: { diameter?: number; operateur: string };
+    gravity: { gravity?: number; operateur: string };
+    population: { population?: number; operateur: string };
     climate: string;
     terrain: string;
   };
@@ -28,22 +33,24 @@ type StateType = {
 
 export default function PlanetsPage() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
+    orderBy: { field: null, order: true },
     filter: {
       name: '',
-      diameter: { diameter: '', operateur: '<' },
-      gravity: { gravity: '', operateur: '<' },
-      population: { population: '', operateur: '<' },
+      diameter: { diameter: undefined, operateur: '<' },
+      gravity: { gravity: undefined, operateur: '<' },
+      population: { population: undefined, operateur: '<' },
       climate: '',
       terrain: '',
     },
     filteredItems: [],
   });
 
-  const handleChange = (champ: string, value: string) => {
+  const handleTextChange = (champ: string, value: string) => {
     setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
   };
-  const handleFilterChange = (
+  const handleOtherInputChange = (
     champ: 'population' | 'gravity' | 'diameter',
     key: 'population' | 'gravity' | 'diameter' | 'operateur',
     value: string,
@@ -54,45 +61,55 @@ export default function PlanetsPage() {
         ...prevState.filter,
         [champ]: {
           ...prevState.filter[champ],
-          [key]: value, // Mettre à jour la clé spécifiée sous le champ principal
+          [key]: value,
         },
       },
     }));
   };
-  // const logState = () => {
-  //   console.log(state);
-  // };
+  const handleOrderChange = (orderBy: OrderBy) => {
+    setState((prevState) => ({
+      ...prevState,
+      orderBy: orderBy,
+    }));
+  };
 
   const planets: Planet[] = useSelector(getPlanets);
-  console.log('Planetfrom state:', planets);
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await getAll('planets');
-        dispatch(setPlanets(response));
+        dispatch(setPlanets(response as Planet[]));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading(false);
     };
 
-    const filterField = (field: 'terrain' | 'climate' | 'name', array: Planet[]): Planet[] => {
+    if (!planets.length) fetchItems();
+    else setIsLoading(false);
+  }, [dispatch, planets]);
+
+  useEffect(() => {
+    const filterTextField = (field: 'terrain' | 'climate' | 'name', array: Planet[]): Planet[] => {
       if (state.filter[field]) {
         const regex = new RegExp(state.filter[field], 'i');
         return array.filter((item) => regex.test(item[field]));
       }
       return array;
     };
-    const filterByField = (
-      array: Planet[],
+
+    const filterByNumberField = (
       field: keyof Planet,
       operateur: string,
-      value: number | string,
+      value: number | string | undefined,
+      array: Planet[],
     ): Planet[] => {
-      const numberValue = Number(value);
-      if (!numberValue) {
+      if (!value) {
         return array;
       }
+      const numberValue = Number(value);
       return array.filter((item) => {
         const itemValue = Number(item[field]);
         switch (operateur) {
@@ -111,157 +128,144 @@ export default function PlanetsPage() {
         }
       });
     };
+    const sortArray = (
+      array: Planet[],
+      order: boolean,
+      field: 'name' | 'diameter' | 'gravity' | 'population',
+    ): Planet[] => {
+      const sortedArray = [...array];
+      if (order)
+        return sortedArray.sort((a, b) => String(a[field]).localeCompare(String(b[field])));
+      return sortedArray.sort((a, b) => String(b[field]).localeCompare(String(a[field])));
+    };
     const Filter = (array: Planet[]): void => {
-      let filteredArray = filterByField(
-        array,
+      const filter = state.filter;
+      const orderBy = state.orderBy;
+
+      let filteredArray = filterByNumberField(
         'diameter',
-        state.filter.diameter.operateur,
-        state.filter.diameter.diameter,
+        filter.diameter.operateur,
+        filter.diameter.diameter,
+        array,
       );
-      filteredArray = filterByField(
-        filteredArray,
+      filteredArray = filterByNumberField(
         'gravity',
-        state.filter.gravity.operateur,
-        state.filter.gravity.gravity,
-      );
-      filteredArray = filterByField(
+        filter.gravity.operateur,
+        filter.gravity.gravity,
         filteredArray,
-        'population',
-        state.filter.population.operateur,
-        state.filter.population.population,
       );
-      filteredArray = filterField('terrain', filteredArray);
-      filteredArray = filterField('climate', filteredArray);
-      filteredArray = filterField('name', filteredArray);
+      filteredArray = filterByNumberField(
+        'population',
+        filter.population.operateur,
+        filter.population.population,
+        filteredArray,
+      );
+      filteredArray = filterTextField('terrain', filteredArray);
+      filteredArray = filterTextField('climate', filteredArray);
+      filteredArray = filterTextField('name', filteredArray);
+
+      if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
+
       setState((prevState) => ({
         ...prevState,
         filteredItems: filteredArray,
       }));
     };
-
-    if (!planets.length) {
-      fetchItems();
-    }
-    Filter(planets);
-  }, [dispatch, state.filter, planets]);
+    if (planets.length) Filter(planets);
+  }, [state.orderBy, state.filter, planets]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      {/* <button onClick={() => logState()}>Log State</button> */}
-      <div className="filterContainer">
-        <div>
-          <button onClick={() => handleChange('name', '')}>X</button>
-          <label htmlFor="name">Name:</label>
-          <input
-            value={state.filter.name}
-            type="text"
-            id="name"
-            onChange={(e) => handleChange('name', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('population', 'population', '')}>X</button>
-          <label htmlFor="population">Population:</label>
-          <select
-            value={state.filter.population.operateur}
-            onChange={(e) => handleFilterChange('population', 'operateur', e.target.value)}
-            name="operateur"
-            id="population"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="population"
-            min={0}
-            value={state.filter.population.population}
-            onChange={(e) => handleFilterChange('population', 'population', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('climate', '')}>X</button>
-          <label htmlFor="climate">Climate:</label>
-          <input
-            value={state.filter.climate}
-            type="text"
-            id="climate"
-            onChange={(e) => handleChange('climate', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('terrain', '')}>X</button>
-          <label htmlFor="terrain">Terrain:</label>
-          <input
-            value={state.filter.terrain}
-            type="text"
-            id="terrain"
-            onChange={(e) => handleChange('terrain', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('diameter', 'diameter', '')}>X</button>
-          <label htmlFor="diameter">Diameter:</label>
-          <select
-            value={state.filter.diameter.operateur}
-            onChange={(e) => handleFilterChange('diameter', 'operateur', e.target.value)}
-            name="operateur"
-            id="diameter"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="diameter"
-            min={0}
-            value={state.filter.diameter.diameter}
-            onChange={(e) => handleFilterChange('diameter', 'diameter', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleFilterChange('gravity', 'gravity', '')}>X</button>
-          <label htmlFor="gravity">Gravity:</label>
-          <select
-            value={state.filter.gravity.operateur}
-            onChange={(e) => handleFilterChange('gravity', 'operateur', e.target.value)}
-            name="operateur"
-            id="gravity"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="gravity"
-            min={0}
-            value={state.filter.gravity.gravity}
-            onChange={(e) => handleFilterChange('gravity', 'gravity', e.target.value)}
-          />
-        </div>
+      <div className={style.filterContainer}>
+        <TextInputField
+          label="Name"
+          name="name"
+          value={state.filter.name}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'name')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'name', order: true });
+          }}
+          onChange={(e) => handleTextChange('name', e.target.value)}
+          onClear={() => handleTextChange('name', '')}
+          placeholder="Ex: Tatouine"
+        />
+        <OtherInputField
+          label="Population"
+          name="population"
+          operateur={state.filter.population.operateur}
+          value={state.filter.population.population}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'population')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'population', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('population', 'operateur', e.target.value)
+          }
+          onDateChange={(e) => handleOtherInputChange('population', 'population', e.target.value)}
+          onClear={() => handleOtherInputChange('population', 'population', '')}
+        />
+        <TextInputField
+          label="Climate"
+          name="climate"
+          value={state.filter.climate}
+          onChange={(e) => handleTextChange('climate', e.target.value)}
+          onClear={() => handleTextChange('climate', '')}
+          placeholder="Ex: rainy"
+        />
+        <TextInputField
+          label="Terrain"
+          name="terrain"
+          value={state.filter.terrain}
+          onChange={(e) => handleTextChange('terrain', e.target.value)}
+          onClear={() => handleTextChange('terrain', '')}
+          placeholder="Ex: mud"
+        />
+        <OtherInputField
+          label="Diameter"
+          name="diameter"
+          operateur={state.filter.diameter.operateur}
+          value={state.filter.diameter.diameter}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'diameter')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'diameter', order: true });
+          }}
+          onOperateurChange={(e) => handleOtherInputChange('diameter', 'operateur', e.target.value)}
+          onDateChange={(e) => handleOtherInputChange('diameter', 'diameter', e.target.value)}
+          onClear={() => handleOtherInputChange('diameter', 'diameter', '')}
+        />
+        <OtherInputField
+          label="Gravity"
+          name="gravity"
+          operateur={state.filter.gravity.operateur}
+          value={state.filter.gravity.gravity}
+          type="number"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'gravity')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'gravity', order: true });
+          }}
+          onOperateurChange={(e) => handleOtherInputChange('gravity', 'operateur', e.target.value)}
+          onDateChange={(e) => handleOtherInputChange('gravity', 'gravity', e.target.value)}
+          onClear={() => handleOtherInputChange('gravity', 'gravity', '')}
+        />
       </div>
-      <div className="container">
+      <div className={style.container}>
         <h1>The Planets:</h1>
-        {state.filteredItems.map((item, index) => (
-          <CardPlanets key={index} item={item} />
-        ))}
-        {/* TODO Faire un affichage si aucun résultat */}
+        {isLoading ? (
+          <p>Chargement...</p>
+        ) : (
+          state.filteredItems.map((item) => <Card key={item.name} item={item} />)
+        )}
       </div>
     </div>
   );

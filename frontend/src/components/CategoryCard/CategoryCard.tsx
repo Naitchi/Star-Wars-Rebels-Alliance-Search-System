@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import './CategoryCard.css';
+import style from './CategoryCard.module.css';
 
 export default function CategoryCard(
   props: Readonly<{
@@ -7,7 +7,7 @@ export default function CategoryCard(
   }>,
 ) {
   return (
-    <Link className="link" to={`/${props.item.url}`}>
+    <Link className={style.link} to={`/${props.item.url}`}>
       <div
         style={{
           backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.5) 100%), url(${props.item.image})`,
@@ -15,7 +15,7 @@ export default function CategoryCard(
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}
-        className="thumb"
+        className={style.thumb}
       >
         <h2>{props.item.name}</h2>
       </div>

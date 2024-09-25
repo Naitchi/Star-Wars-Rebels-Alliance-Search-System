@@ -10,7 +10,7 @@ import { getStarship, setStarship } from '../../store/starshipSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './StarshipDetailsPage.css';
+import style from './StarshipDetailsPage.module.css';
 
 // Types
 import { Starship } from '../../types/types';
@@ -30,7 +30,7 @@ export default function StarshipDetailsPage() {
     const fetchItems = async () => {
       try {
         const response = await getAll('starship');
-        dispatch(setStarship(response));
+        dispatch(setStarship(response as Starship[])); //TODO modifié ça pour le getOneElement
       } catch (err) {
         console.log(err);
       }
@@ -42,10 +42,10 @@ export default function StarshipDetailsPage() {
   }, [dispatch, starships]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.name}</h1>
           <p>
             {/* TODO Mettre des icones Font-Awesome */}Megalight per hour: {item.MGLT}
@@ -62,7 +62,7 @@ export default function StarshipDetailsPage() {
           <p>Model : {item.model}</p>
           <p>Passengers : {item.passengers}</p>
           <p>Starship Class : {item.starship_class}</p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -71,7 +71,7 @@ export default function StarshipDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',

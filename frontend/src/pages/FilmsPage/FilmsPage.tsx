@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
-import Card from '../../components/CardFilms/CardFilms';
+import Card from '../../components/Card/Card';
+import OtherInputField from '../../components/OtherInputField/OtherInputField';
+import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
-import './FilmsPage.css';
+import style from './FilmsPage.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,238 +16,264 @@ import { getFilms, setFilms } from '../../store/filmsSlice';
 import { getAll } from '../../services/data.service';
 import { Films } from '../../types/types';
 
+type OrderBy = { field: 'title' | 'episode_id' | 'release_date' | null; order: boolean };
+
 type StateType = {
+  orderBy: OrderBy;
   filter: {
-    title: string | undefined;
-    episode_id: { number: number | undefined; operateur: string };
-    director: string | undefined;
-    producer: string | undefined;
-    release_date: { date: string | undefined; operateur: string };
+    title: string;
+    episode_id: { episode_id?: number; operateur: string };
+    director: string;
+    producer: string;
+    release_date: { release_date?: string; operateur: string };
   };
   filteredItems: Films[];
 };
 
 export default function FilmsPage() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
+    orderBy: { field: null, order: true },
     filter: {
       title: '',
-      episode_id: { number: undefined, operateur: '<' },
+      episode_id: { episode_id: undefined, operateur: '<' },
       director: '',
       producer: '',
-      release_date: { date: undefined, operateur: '<' },
+      release_date: { release_date: undefined, operateur: '<' },
     },
     filteredItems: [],
   });
 
-  const handleChange = (champ: string, value: string) => {
+  const handleTextChange = (champ: string, value: string) => {
     setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
   };
-  const handleEpisodeChange = (champ: string, value: string) => {
+  const handleOtherInputChange = (
+    champ: 'release_date' | 'episode_id',
+    key: 'release_date' | 'episode_id' | 'operateur',
+    value: string,
+  ) => {
     setState((prevState) => ({
       ...prevState,
       filter: {
         ...prevState.filter,
-        episode_id: {
-          ...prevState.filter.episode_id,
-          [champ]: value,
+        [champ]: {
+          ...prevState.filter[champ],
+          [key]: value,
         },
       },
     }));
   };
-  const handleReleaseChange = (champ: string, value: string) => {
+  const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
-        release_date: {
-          ...prevState.filter.release_date,
-          [champ]: value,
-        },
-      },
+      orderBy: orderBy,
     }));
   };
-
-  // const logState = () => {
-  //   console.log(state);
-  // };
-
-  // TODO faire des types de filtrage différent du style croissant décroissant
 
   const films: Films[] = useSelector(getFilms);
-  console.log('Films from state:', films);
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await getAll('films');
-        dispatch(setFilms(response));
+        dispatch(setFilms(response as Films[]));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading(false);
     };
-    const filterField = (field: 'title' | 'director' | 'producer', array: Films[]): Films[] => {
+
+    if (!films.length) fetchItems();
+    else setIsLoading(false);
+  }, [dispatch, films]);
+
+  useEffect(() => {
+    const filterTextField = (field: 'title' | 'director' | 'producer', array: Films[]): Films[] => {
       if (state.filter[field]) {
         const regex = new RegExp(state.filter[field], 'i');
         return array.filter((item) => regex.test(item[field]));
       }
       return array;
     };
-    const filterEpisode = (array: Films[]): Films[] => {
-      const { operateur, number } = state.filter.episode_id;
-      if (number && operateur) {
-        return array.filter((item) => {
-          switch (operateur) {
-            case '<':
-              return item.episode_id < number;
-            case '>':
-              return item.episode_id > number;
-            case '<=':
-              return item.episode_id <= number;
-            case '>=':
-              return item.episode_id >= number;
-            case '=':
-              return item.episode_id == number;
-            default:
-              return false;
-          }
-        });
+    const filterByDateField = (
+      field: 'release_date',
+      operateur: string,
+      value: number | string | undefined,
+      array: Films[],
+    ): Films[] => {
+      if (!value) {
+        return array;
       }
-      return array;
+      const numberValue = new Date(value).getTime();
+      return array.filter((item) => {
+        const itemValue = new Date(item[field]).getTime();
+        switch (operateur) {
+          case '<':
+            return itemValue < numberValue;
+          case '>':
+            return itemValue > numberValue;
+          case '<=':
+            return itemValue <= numberValue;
+          case '>=':
+            return itemValue >= numberValue;
+          case '=':
+            return itemValue == numberValue;
+          default:
+            return false;
+        }
+      });
     };
-    const filterDate = (array: Films[]): Films[] => {
-      const date = Number(state.filter.release_date);
-      const operateur = state.filter.release_date.operateur;
-      if (date && operateur) {
-        return array.filter((item) => {
-          const release_date = Number(item.release_date);
-          switch (operateur) {
-            case '<':
-              return release_date < date;
-            case '>':
-              return release_date > date;
-            case '<=':
-              return release_date <= date;
-            case '>=':
-              return release_date >= date;
-            case '=':
-              return release_date == date;
-            default:
-              return false;
-          }
-        });
+    const filterByNumberField = (
+      field: keyof Films,
+      operateur: string,
+      value: number | string | undefined,
+      array: Films[],
+    ): Films[] => {
+      if (!value) {
+        return array;
       }
-      return array;
+      const numberValue = Number(value);
+      return array.filter((item) => {
+        const itemValue = Number(item[field]);
+        switch (operateur) {
+          case '<':
+            return itemValue < numberValue;
+          case '>':
+            return itemValue > numberValue;
+          case '<=':
+            return itemValue <= numberValue;
+          case '>=':
+            return itemValue >= numberValue;
+          case '=':
+            return itemValue == numberValue;
+          default:
+            return false;
+        }
+      });
+    };
+    const sortArray = (
+      array: Films[],
+      order: boolean,
+      field: 'title' | 'episode_id' | 'release_date',
+    ): Films[] => {
+      const sortedArray = [...array];
+      if (order)
+        return sortedArray.sort((a, b) => String(a[field]).localeCompare(String(b[field])));
+      return sortedArray.sort((a, b) => String(b[field]).localeCompare(String(a[field])));
     };
     const Filter = (array: Films[]): void => {
-      let filteredArray = filterDate(array);
-      filteredArray = filterField('director', filteredArray);
-      filteredArray = filterEpisode(filteredArray);
-      filteredArray = filterField('title', filteredArray);
-      filteredArray = filterField('producer', filteredArray);
+      const filter = state.filter;
+      const orderBy = state.orderBy;
+
+      let filteredArray = filterByDateField(
+        'release_date',
+        filter.release_date.operateur,
+        filter.release_date.release_date,
+        array,
+      );
+      filteredArray = filterByNumberField(
+        'episode_id',
+        filter.episode_id.operateur,
+        filter.episode_id.episode_id,
+        filteredArray,
+      );
+      filteredArray = filterTextField('director', filteredArray);
+      filteredArray = filterTextField('title', filteredArray);
+      filteredArray = filterTextField('producer', filteredArray);
+
+      if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
       setState((prevState) => ({
         ...prevState,
         filteredItems: filteredArray,
       }));
     };
 
-    if (!films.length) {
-      fetchItems();
-    }
-    Filter(films);
-  }, [dispatch, state.filter, films]);
+    if (films.length) Filter(films);
+  }, [state.filter, state.orderBy, films]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      {/* <button onClick={() => logState()}>Log State</button> */}
-      <div className="filterContainer">
-        <div>
-          <button onClick={() => handleChange('title', '')}>X</button>
-          <label htmlFor="title">Title:</label>
-          <input
-            value={state.filter.title}
-            type="text"
-            id="title"
-            onChange={(e) => handleChange('title', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleEpisodeChange('number', '')}>X</button>
-          <label htmlFor="episode">Episode:</label>
-          <select
-            value={state.filter.episode_id.operateur}
-            onChange={(e) => handleEpisodeChange('operateur', e.target.value)}
-            name="operateur"
-            id="episode"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="number"
-            id="episode"
-            max={6}
-            min={1}
-            value={state.filter.episode_id.number}
-            onChange={(e) => handleEpisodeChange('number', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('director', '')}>X</button>
-          <label htmlFor="director">Director:</label>
-          <input
-            value={state.filter.director}
-            type="text"
-            id="director"
-            onChange={(e) => handleChange('director', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('producer', '')}>X</button>
-          <label htmlFor="producer">Producer:</label>
-          <input
-            value={state.filter.producer}
-            type="text"
-            id="producer"
-            onChange={(e) => handleChange('producer', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleReleaseChange('date', '')}>X</button>
-          <label htmlFor="release_date">Release Date:</label>
-          <select
-            value={state.filter.release_date.operateur}
-            onChange={(e) => handleReleaseChange('operateur', e.target.value)}
-            name="operateur"
-            id="release_date"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="date"
-            id="release_date"
-            value={state.filter.release_date.date}
-            onChange={(e) => handleReleaseChange('date', e.target.value)}
-          />
-        </div>
+      <div className={style.filterContainer}>
+        <TextInputField
+          label="Title"
+          name="title"
+          value={state.filter.title}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'title')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'title', order: true });
+          }}
+          onChange={(e) => handleTextChange('title', e.target.value)}
+          onClear={() => handleTextChange('title', '')}
+          placeholder="Ex: A New Hope"
+        />
+        <OtherInputField
+          label="Episode"
+          name="episode_id"
+          operateur={state.filter.episode_id.operateur}
+          value={state.filter.episode_id.episode_id}
+          type="number"
+          max={6}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'episode_id')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'episode_id', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('episode_id', 'operateur', e.target.value)
+          }
+          onDateChange={(e) => handleOtherInputChange('episode_id', 'episode_id', e.target.value)}
+          onClear={() => handleOtherInputChange('episode_id', 'episode_id', '')}
+        />
+        <OtherInputField
+          label="Release Date"
+          name="release_date"
+          operateur={state.filter.release_date.operateur}
+          value={state.filter.release_date.release_date}
+          type="date"
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'release_date')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'release_date', order: true });
+          }}
+          onOperateurChange={(e) =>
+            handleOtherInputChange('release_date', 'operateur', e.target.value)
+          }
+          onDateChange={(e) =>
+            handleOtherInputChange('release_date', 'release_date', e.target.value)
+          }
+          onClear={() => handleOtherInputChange('release_date', 'release_date', '')}
+        />
+        <TextInputField
+          label="Director"
+          name="director"
+          value={state.filter.director}
+          onChange={(e) => handleTextChange('director', e.target.value)}
+          onClear={() => handleTextChange('director', '')}
+          placeholder="Ex: George"
+        />
+        <TextInputField
+          label="Producer"
+          name="producer"
+          value={state.filter.producer}
+          onChange={(e) => handleTextChange('producer', e.target.value)}
+          onClear={() => handleTextChange('producer', '')}
+          placeholder="Ex: Lucas"
+        />
       </div>
-      <div className="container">
+      <div className={style.container}>
         <h1>The Movies:</h1>
-        {state.filteredItems.map((item, index) => (
-          <Card key={index} item={item} />
-        ))}
+        {isLoading ? (
+          <p>Chargement...</p>
+        ) : (
+          state.filteredItems.map((item) => <Card key={item.title} item={item} />)
+        )}
       </div>
     </div>
   );

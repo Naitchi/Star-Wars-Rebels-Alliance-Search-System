@@ -10,7 +10,7 @@ import { getVehicles, setVehicles } from '../../store/vehiclesSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './VehicleDetailsPage.css';
+import style from './VehicleDetailsPage.module.css';
 
 // Types
 import { Vehicle } from '../../types/types';
@@ -42,10 +42,10 @@ export default function VehicleDetailsPage() {
   }, [dispatch, vehicles]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.name}</h1>
           <p>
             {/* TODO Mettre des icones Font-Awesome */}Cargo Capacity : {item.cargo_capacity}
@@ -60,7 +60,7 @@ export default function VehicleDetailsPage() {
           <p>Model: {item.model}</p>
           <p>Passengers: {item.passengers}</p>
           <p>Vehicle Class: {item.vehicle_class}</p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -69,7 +69,7 @@ export default function VehicleDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',

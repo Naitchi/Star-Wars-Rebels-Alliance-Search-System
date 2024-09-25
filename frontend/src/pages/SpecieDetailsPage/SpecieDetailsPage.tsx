@@ -10,7 +10,7 @@ import { getSpecies, setSpecies } from '../../store/speciesSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './SpecieDetailsPage.css';
+import style from './SpecieDetailsPage.module.css';
 
 // Types
 import { Species } from '../../types/types';
@@ -30,7 +30,7 @@ export default function SpecieDetailsPage() {
     const fetchItems = async () => {
       try {
         const response = await getAll('species');
-        dispatch(setSpecies(response));
+        dispatch(setSpecies(response as Species[]));
       } catch (err) {
         console.log(err);
       }
@@ -42,10 +42,10 @@ export default function SpecieDetailsPage() {
   }, [dispatch, species]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.name}</h1>
           <p>
             {/* TODO Mettre des icones Font-Awesome */}Average height: {item.average_height} cm
@@ -58,7 +58,7 @@ export default function SpecieDetailsPage() {
           <p>Hair Colors: {item.hair_colors}</p>
           <p>Language: {item.language}</p>
           <p>Skin Colors : {item.skin_colors}</p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -67,7 +67,7 @@ export default function SpecieDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',

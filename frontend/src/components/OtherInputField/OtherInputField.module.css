@@ -1,0 +1,13 @@
+.inputField {
+    .label {
+        color: darkgray;
+    }
+
+    .input {
+        color: darkgray;
+    }
+
+    .deleteBtn {
+        margin-left: '8px'
+    }
+}

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 
 // Components
-import CardPeople from '../../components/CardPeople/CardPeople';
+import Card from '../../components/Card/Card';
 import Header from '../../components/Header/Header';
+import OtherInputField from '../../components/OtherInputField/OtherInputField';
+import SelectInputField from '../../components/SelectInputField/SelectInputField';
+import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
-import './PeoplePage.css';
+import style from './PeoplePage.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,15 +16,18 @@ import { getAll } from '../../services/data.service';
 import { getPeople, setPeople } from '../../store/peopleSlice';
 import { People } from '../../types/types';
 
+type OrderBy = { field: 'name' | 'birth_year' | 'height' | 'mass' | null; order: boolean };
+
 type StateType = {
+  orderBy: OrderBy;
   filter: {
     name: string;
-    birth_year: { date: string; operateur: string };
+    birth_year: { birth_year: string; operateur: string };
     eye_color: string;
     gender: string;
     hair_color: string;
-    height: string;
-    mass: string;
+    height: { height?: number; operateur: string };
+    mass: { mass?: number; operateur: string };
     skin_color: string;
     homeworld: string;
   };
@@ -30,63 +36,70 @@ type StateType = {
 
 export default function PeoplePage() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
+    orderBy: { field: null, order: true },
     filter: {
       name: '',
-      birth_year: { date: '', operateur: '' },
+      birth_year: { birth_year: '', operateur: '<' },
       eye_color: '',
       gender: '',
       hair_color: '',
-      height: '', // TODO mettre operateur
-      mass: '', // TODO mettre operateur
+      height: { height: undefined, operateur: '<' },
+      mass: { mass: undefined, operateur: '<' },
       skin_color: '',
       homeworld: '',
     },
     filteredItems: [],
   });
 
-  const handleChange = (champ: string, value: string) => {
+  const handleTextChange = (champ: string, value: string) => {
     setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
   };
-  const handleBirthChange = (champ: string, value: string) => {
+  const handleOtherInputChange = (
+    champ: 'birth_year' | 'height' | 'mass',
+    key: 'birth_year' | 'height' | 'mass' | 'operateur',
+    value: string,
+  ) => {
     setState((prevState) => ({
       ...prevState,
       filter: {
         ...prevState.filter,
-        release_date: {
-          ...prevState.filter.birth_year,
-          [champ]: value,
+        [champ]: {
+          ...prevState.filter[champ],
+          [key]: value,
         },
       },
     }));
   };
-
-  const logState = () => {
-    console.log(state);
+  const handleOrderChange = (orderBy: OrderBy) => {
+    setState((prevState) => ({
+      ...prevState,
+      orderBy: orderBy,
+    }));
   };
 
   const people: People[] = useSelector(getPeople);
-  console.log('People from state:', people);
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await getAll('people');
-        dispatch(setPeople(response));
+        dispatch(setPeople(response as People[]));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading(false);
     };
-    const filterField = (
-      field:
-        | 'name'
-        | 'eye_color'
-        | 'gender'
-        | 'hair_color'
-        | 'height'
-        | 'mass'
-        | 'skin_color'
-        | 'homeworld',
+
+    if (!people.length) fetchItems();
+    else setIsLoading(false);
+  }, [dispatch, people]);
+
+  useEffect(() => {
+    const filterTextField = (
+      field: 'name' | 'eye_color' | 'gender' | 'hair_color' | 'skin_color' | 'homeworld',
       array: People[],
     ): People[] => {
       if (state.filter[field]) {
@@ -95,171 +108,232 @@ export default function PeoplePage() {
       }
       return array;
     };
-    const filterDate = (array: People[]): People[] => {
-      const date = Number(state.filter.birth_year);
-      const operateur = state.filter.birth_year.operateur;
-      if (date && operateur) {
-        return array.filter((item) => {
-          const release_date = Number(item.birth_year);
-          switch (operateur) {
-            case '<':
-              return release_date < date;
-            case '>':
-              return release_date > date;
-            case '<=':
-              return release_date <= date;
-            case '>=':
-              return release_date >= date;
-            case '=':
-              return release_date === date;
-            default:
-              return false;
-          }
-        });
+    const filterByDateField = (
+      field: 'birth_year',
+      operateur: string,
+      value: number | string | undefined,
+      array: People[],
+    ): People[] => {
+      if (!value) {
+        return array;
       }
-      return array;
+      const numberValue = new Date(value).getTime();
+      return array.filter((item) => {
+        const itemValue = new Date(item[field]).getTime();
+        switch (operateur) {
+          case '<':
+            return itemValue < numberValue;
+          case '>':
+            return itemValue > numberValue;
+          case '<=':
+            return itemValue <= numberValue;
+          case '>=':
+            return itemValue >= numberValue;
+          case '=':
+            return itemValue == numberValue;
+          default:
+            return false;
+        }
+      });
+    };
+    const filterByNumberField = (
+      field: 'mass' | 'height',
+      operateur: string,
+      value: number | string | undefined,
+      array: People[],
+    ): People[] => {
+      if (!value) {
+        return array;
+      }
+      const numberValue = Number(value);
+      return array.filter((item) => {
+        const itemValue = Number(item[field]);
+        switch (operateur) {
+          case '<':
+            return itemValue < numberValue;
+          case '>':
+            return itemValue > numberValue;
+          case '<=':
+            return itemValue <= numberValue;
+          case '>=':
+            return itemValue >= numberValue;
+          case '=':
+            return itemValue == numberValue;
+          default:
+            return false;
+        }
+      });
+    };
+    const sortArray = (
+      array: People[],
+      order: boolean,
+      field: 'name' | 'birth_year' | 'height' | 'mass',
+    ): People[] => {
+      const sortedArray = [...array];
+      if (order)
+        return sortedArray.sort((a, b) => String(a[field]).localeCompare(String(b[field])));
+      return sortedArray.sort((a, b) => String(b[field]).localeCompare(String(a[field])));
     };
     const Filter = (array: People[]): void => {
-      let filteredArray = filterDate(array);
-      filteredArray = filterField('name', filteredArray);
-      filteredArray = filterField('eye_color', filteredArray);
-      filteredArray = filterField('gender', filteredArray);
-      filteredArray = filterField('hair_color', filteredArray);
-      filteredArray = filterField('height', filteredArray);
-      filteredArray = filterField('mass', filteredArray);
-      filteredArray = filterField('homeworld', filteredArray);
-      filteredArray = filterField('skin_color', filteredArray);
+      const filter = state.filter;
+      const orderBy = state.orderBy;
+
+      let filteredArray = filterByDateField(
+        'birth_year',
+        filter.birth_year.operateur,
+        filter.birth_year.birth_year,
+        array,
+      );
+      filteredArray = filterByNumberField(
+        'height',
+        filter.height.operateur,
+        filter.height.height,
+        filteredArray,
+      );
+      filteredArray = filterByNumberField(
+        'mass',
+        filter.mass.operateur,
+        filter.mass.mass,
+        filteredArray,
+      );
+
+      filteredArray = filterTextField('name', filteredArray);
+      filteredArray = filterTextField('eye_color', filteredArray);
+      filteredArray = filterTextField('gender', filteredArray);
+      filteredArray = filterTextField('hair_color', filteredArray);
+      filteredArray = filterTextField('homeworld', filteredArray);
+      filteredArray = filterTextField('skin_color', filteredArray);
+
+      if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
       setState((prevState) => ({
         ...prevState,
         filteredItems: filteredArray,
       }));
     };
 
-    if (!people.length) {
-      fetchItems();
+    if (people.length) {
+      Filter(people);
     }
-    Filter(people);
-  }, [dispatch, state.filter, people]);
+  }, [state.orderBy, state.filter, people]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      <button onClick={() => logState()}>Log State</button>
-      <div className="filterContainer">
-        <div>
-          <button onClick={() => handleChange('name', '')}>X</button>
-          <label htmlFor="name">Name:</label>
-          <input
-            value={state.filter.name}
-            type="text"
-            id="name"
-            onChange={(e) => handleChange('name', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('eye_color', '')}>X</button>
-          <label htmlFor="eye_color">Eye Color:</label>
-          <input
-            value={state.filter.eye_color}
-            type="text"
-            id="eye_color"
-            onChange={(e) => handleChange('eye_color', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('hair_color', '')}>X</button>
-          <label htmlFor="hair_color">Hair Color:</label>
-          <input
-            value={state.filter.hair_color}
-            type="text"
-            id="hair_color"
-            onChange={(e) => handleChange('hair_color', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleBirthChange('date', '')}>X</button>
-          <label htmlFor="birth_year">Birth Year:</label>
-          <select
-            value={state.filter.birth_year.operateur}
-            onChange={(e) => handleBirthChange('operateur', e.target.value)}
-            name="operateur"
-            id="birth_year"
-          >
-            <option selected value="<">
-              &lt;
-            </option>
-            <option value=">">&gt;</option>
-            <option value="=">=</option>
-            <option value="<=">&lt;=</option>
-            <option value=">=">&gt;=</option>
-          </select>
-          <input
-            type="date"
-            id="birth_year"
-            value={state.filter.birth_year.date}
-            onChange={(e) => handleBirthChange('date', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('homeworld', '')}>X</button>
-          <label htmlFor="homeworld">Homeworld:</label>
-          <input
-            value={state.filter.homeworld}
-            type="text"
-            id="homeworld"
-            onChange={(e) => handleChange('homeworld', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('gender', '')}>X</button>
-          <label htmlFor="gender">Gender:</label>
-          <select
-            value={state.filter.gender}
-            id="gender"
-            onChange={(e) => handleChange('gender', e.target.value)}
-          >
-            <option value="n/a">n/a</option>
-            <option value="female">female</option>
-            <option value="male">male</option>
-          </select>
-        </div>
-        <div>
-          <button onClick={() => handleChange('mass', '')}>X</button>
-          <label htmlFor="mass">Mass:</label>
-          <input
-            type="number"
-            min={0}
-            value={state.filter.mass}
-            id="mass"
-            onChange={(e) => handleChange('mass', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('height', '')}>X</button>
-          <label htmlFor="height">Height:</label>
-          <input
-            type="number"
-            min={0}
-            value={state.filter.height}
-            id="height"
-            onChange={(e) => handleChange('height', e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={() => handleChange('skin_color', '')}>X</button>
-          <label htmlFor="skin_color">Skin Color:</label>
-          <input
-            value={state.filter.skin_color}
-            id="skin_color"
-            onChange={(e) => handleChange('skin_color', e.target.value)}
-          />
-        </div>
+      <div className={style.filterContainer}>
+        <TextInputField
+          label="Name"
+          name="name"
+          value={state.filter.name}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'name')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'name', order: true });
+          }}
+          onChange={(e) => handleTextChange('name', e.target.value)}
+          onClear={() => handleTextChange('name', '')}
+          placeholder="Ex: Luke"
+        />
+        <TextInputField
+          label="Eye Color"
+          name="eye_color"
+          value={state.filter.eye_color}
+          onChange={(e) => handleTextChange('eye_color', e.target.value)}
+          onClear={() => handleTextChange('eye_color', '')}
+          placeholder="Ex: blue"
+        />
+        <TextInputField
+          label="Hair Color"
+          name="hair_color"
+          value={state.filter.hair_color}
+          onChange={(e) => handleTextChange('hair_color', e.target.value)}
+          onClear={() => handleTextChange('hair_color', '')}
+          placeholder="Ex: brown"
+        />
+
+        <OtherInputField // TODO changer car les dates c'est "22BDD" (clc)
+          label="Birth Year"
+          name="birth_year"
+          operateur={state.filter.birth_year.operateur}
+          value={state.filter.birth_year.birth_year}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'birth_year')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'birth_year', order: true });
+          }}
+          type="date"
+          onOperateurChange={(e) =>
+            handleOtherInputChange('birth_year', 'operateur', e.target.value)
+          }
+          onDateChange={(e) => handleOtherInputChange('birth_year', 'birth_year', e.target.value)}
+          onClear={() => handleOtherInputChange('birth_year', 'birth_year', '')}
+        />
+
+        <TextInputField // TODO à changer
+          label="Homeworld"
+          name="homeworld"
+          value={state.filter.homeworld}
+          onChange={(e) => handleTextChange('homeworld', e.target.value)}
+          onClear={() => handleTextChange('homeworld', '')}
+          placeholder="Ex: Earth"
+        />
+        <SelectInputField
+          label="Gender"
+          name="gender"
+          options={['n/a', 'female', 'male']}
+          value={state.filter.gender}
+          onChange={(e) => handleTextChange('gender', e.target.value)}
+          onClear={() => handleTextChange('gender', '')}
+        />
+        <OtherInputField
+          label="Mass"
+          name="mass"
+          operateur={state.filter.mass.operateur}
+          value={state.filter.mass.mass}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'mass')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'mass', order: true });
+          }}
+          type="number"
+          onOperateurChange={(e) => handleOtherInputChange('mass', 'operateur', e.target.value)}
+          onDateChange={(e) => handleOtherInputChange('mass', 'mass', e.target.value)}
+          onClear={() => handleOtherInputChange('mass', 'mass', '')}
+        />
+        <OtherInputField
+          label="height"
+          name="height"
+          operateur={state.filter.height.operateur}
+          value={state.filter.height.height}
+          orderBy={state.orderBy}
+          onOrderChange={() => {
+            if (state.orderBy.field === 'height')
+              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
+            else handleOrderChange({ field: 'height', order: true });
+          }}
+          type="number"
+          onOperateurChange={(e) => handleOtherInputChange('height', 'operateur', e.target.value)}
+          onDateChange={(e) => handleOtherInputChange('height', 'height', e.target.value)}
+          onClear={() => handleOtherInputChange('height', 'height', '')}
+        />
+        <TextInputField
+          label="Skin Color"
+          name="skin_color"
+          value={state.filter.skin_color}
+          onChange={(e) => handleTextChange('skin_color', e.target.value)}
+          onClear={() => handleTextChange('skin_color', '')}
+          placeholder="Ex: beige"
+        />
       </div>
-      <div className="container">
+      <div className={style.container}>
         <h1>The Peoples:</h1>
-        {state.filteredItems.map((item, index) => (
-          <CardPeople key={index} item={item} />
-        ))}
+        {isLoading ? (
+          <p>Chargement...</p>
+        ) : (
+          state.filteredItems.map((item) => <Card key={item.name} item={item} />)
+        )}
       </div>
     </div>
   );

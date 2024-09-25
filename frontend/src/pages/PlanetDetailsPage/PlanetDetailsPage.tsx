@@ -10,7 +10,7 @@ import { getPlanets, setPlanets } from '../../store/planetsSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './PlanetDetailsPage.css';
+import style from './PlanetDetailsPage.module.css';
 
 // Types
 import { Planet } from '../../types/types';
@@ -42,11 +42,11 @@ export default function PlanetDetailsPage() {
   }, [dispatch, planets]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
 
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.name}</h1>
           <p>
             {/* TODO Mettre des icones Font-Awesome */}Climate : {item.climate}
@@ -59,7 +59,7 @@ export default function PlanetDetailsPage() {
           <p>Rotation Period: {item.rotation_period}</p>
           <p>Surface Water: {item.surface_water}</p>
           <p>Terrain : {item.terrain}</p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -68,7 +68,7 @@ export default function PlanetDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',

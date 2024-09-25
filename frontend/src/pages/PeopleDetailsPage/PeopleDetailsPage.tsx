@@ -10,7 +10,7 @@ import { getPeople, setPeople } from '../../store/peopleSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './PeopleDetailsPage.css';
+import style from './PeopleDetailsPage.module.css';
 
 // Types
 import { People } from '../../types/types';
@@ -42,11 +42,10 @@ export default function PeopleDetailsPage() {
   }, [dispatch, peoples]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
-      {/*    species starships vehicles */}
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.name}</h1>
           <p>
             {/* TODO Mettre des icones Font-Awesome */}Birth Year : {item.birth_year}
@@ -58,7 +57,7 @@ export default function PeopleDetailsPage() {
           <p>Height: {item.height}</p>
           <p>Mass: {item.mass}</p>
           <p>Skin Color: {item.skin_color}</p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -67,7 +66,7 @@ export default function PeopleDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',

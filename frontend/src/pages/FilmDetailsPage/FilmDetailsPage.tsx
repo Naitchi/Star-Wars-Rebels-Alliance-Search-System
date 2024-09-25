@@ -10,7 +10,7 @@ import { getFilms, setFilms } from '../../store/filmsSlice';
 import Header from '../../components/Header/Header';
 
 // Css
-import './FilmDetailsPage.css';
+import style from './FilmDetailsPage.module.css';
 
 // Types
 import { Films } from '../../types/types';
@@ -42,11 +42,11 @@ export default function FilmDetailsPage() {
   }, [dispatch, films]);
 
   return (
-    <div className="app">
+    <div className={style.app}>
       <Header />
 
       {item && (
-        <div className="container">
+        <div className={style.container}>
           <h1>{item.title}</h1>
           <p>
             By Director: {item.director} and Producer : {item.producer}
@@ -64,7 +64,7 @@ export default function FilmDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             created the{' '}
             {new Date(item.created).toLocaleDateString('en-GB', {
               weekday: 'long',
@@ -73,7 +73,7 @@ export default function FilmDetailsPage() {
               day: 'numeric',
             })}
           </p>
-          <p className="subtext">
+          <p className={style.subtext}>
             edited the{' '}
             {new Date(item.edited).toLocaleDateString('en-GB', {
               weekday: 'long',
