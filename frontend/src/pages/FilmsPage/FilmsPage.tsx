@@ -268,9 +268,9 @@ export default function FilmsPage() {
         />
       </div>
       <div className={style.container}>
-        <h1>The Movies:</h1>
+        <h1 className={style.title}>The Movies:</h1> {/* Ajout de la classe ici */}
         {isLoading ? (
-          <p>Chargement...</p>
+          <p className={style.loadingText}>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.title} item={item} />)
         )}

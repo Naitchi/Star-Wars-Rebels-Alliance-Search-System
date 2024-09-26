@@ -1,5 +1,4 @@
 import React from 'react';
-
 import style from './SelectInputField.module.css';
 
 interface SelectInputFieldProps {
@@ -21,9 +20,18 @@ const SelectInputField: React.FC<SelectInputFieldProps> = ({
 }) => {
   return (
     <div className={style.inputField}>
-      <label className={style.label} htmlFor={name}>
-        {label}:
-      </label>
+      <div className={style.orderContainer}>
+        <label className={style.label} htmlFor={name}>
+          {label}:
+        </label>
+        <div className={style.deleteContainer}>
+          {value && (
+            <button className={style.deleteBtn} onClick={onClear}>
+              X
+            </button>
+          )}
+        </div>
+      </div>
       <select className={style.input} id={name} value={value} onChange={onChange}>
         {options.map((item) => (
           <option key={item} value={item}>
@@ -31,11 +39,6 @@ const SelectInputField: React.FC<SelectInputFieldProps> = ({
           </option>
         ))}
       </select>
-      {value && (
-        <button className={style.deleteBtn} onClick={onClear}>
-          X
-        </button>
-      )}
     </div>
   );
 };

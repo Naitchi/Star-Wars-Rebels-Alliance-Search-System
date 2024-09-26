@@ -3,18 +3,32 @@ import style from './Header.module.css';
 
 export default function Header() {
   return (
-    <header>
-      <Link to="/">
+    <header className={style.header}>
+      <Link className={style.linkLogo} to="/">
         <img src="../img/logoStarWarsRebelle.png" className={style.logo} alt="Logo Rebelle" />
       </Link>
-      <nav>
-        <Link to="/all">All</Link>
-        <Link to="/films">Films</Link>
-        <Link to="/vehicles">Vehicles</Link>
-        <Link to="/species">Species</Link>
-        <Link to="/planets">Planets</Link>
-        <Link to="/people">People</Link>
-        <Link to="/starships">Starship</Link>
+      <nav className={style.nav}>
+        <Link className={style.link} to="/all">
+          All
+        </Link>
+        <Link className={style.link} to="/films">
+          Films
+        </Link>
+        <Link className={style.link} to="/vehicles">
+          Vehicles
+        </Link>
+        <Link className={style.link} to="/species">
+          Species
+        </Link>
+        <Link className={style.link} to="/planets">
+          Planets
+        </Link>
+        <Link className={style.link} to="/people">
+          People
+        </Link>
+        <Link className={style.link} to="/starships">
+          Starship
+        </Link>
       </nav>
     </header>
   );

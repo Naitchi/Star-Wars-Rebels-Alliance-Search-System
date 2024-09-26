@@ -1,13 +1,86 @@
 .inputField {
-    .label {
-        color: darkgray;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  width: 300px;
+}
 
-    .input {
-        color: darkgray;
-    }
+.orderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 5px;
+}
 
-    .deleteBtn {
-        margin-left: '8px'
-    }
+.label {
+  margin-left: 10px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.deleteContainer {
+  margin-left: auto;
+}
+
+.deleteBtn {
+  background-color: #ff4444;
+  color: #ffffff;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.select,
+.input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #ffffff;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  width: 100%;
+}
+
+.select {
+  margin-right: 10px;
+}
+
+.select:hover,
+.input:hover {
+  border-color: #ff0000;
+}
+
+.select:focus,
+.input:focus {
+  border-color: #ff0000;
+  background-color: #444;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  background-color: #ff0000;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+  background-color: #d40000;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
 }

@@ -216,7 +216,7 @@ export default function SpeciesPage() {
           value={state.filter.classification}
           onChange={(e) => handleTextChange('classification', e.target.value)}
           onClear={() => handleTextChange('classification', '')}
-          placeholder="Ex: A" // TODO mettre un truc mieux
+          placeholder="Ex: mammal"
         />
         <TextInputField
           label="Designation"
@@ -224,7 +224,7 @@ export default function SpeciesPage() {
           value={state.filter.designation}
           onChange={(e) => handleTextChange('designation', e.target.value)}
           onClear={() => handleTextChange('designation', '')}
-          placeholder="Ex: A " // TODO mettre un truc mieux
+          placeholder="Ex: sentient"
         />
         <TextInputField
           label="Eye Colors"
@@ -256,15 +256,7 @@ export default function SpeciesPage() {
           value={state.filter.language}
           onChange={(e) => handleTextChange('language', e.target.value)}
           onClear={() => handleTextChange('language', '')}
-          placeholder="Ex: " // TODO mettre un truc mieux
-        />
-        <TextInputField
-          label="Homeworld"
-          name="homeworld"
-          value={state.filter.homeworld}
-          onChange={(e) => handleTextChange('homeworld', e.target.value)}
-          onClear={() => handleTextChange('homeworld', '')}
-          placeholder="Ex: " // TODO mettre un truc mieux
+          placeholder="Ex: Galactic Basic"
         />
         <OtherInputField
           label="Average Lifespan"
@@ -310,7 +302,7 @@ export default function SpeciesPage() {
       <div className={style.container}>
         <h1>The Species:</h1>
         {isLoading ? (
-          <p>Chargement...</p>
+          <p>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name} item={item} />)
         )}

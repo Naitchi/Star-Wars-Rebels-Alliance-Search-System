@@ -85,9 +85,8 @@ export default function StarshipPage() {
     | 'max_atmosphering_speed'
     | 'hyperdrive_rating'
     | 'MGLT'
-    | 'cargo_capacity'
-    | 'consumables'; // TODO refaire ça marche pas
-  type field = 'name' | 'model' | 'starship_class' | 'manufacturer' | 'crew';
+    | 'cargo_capacity';
+  type field = 'name' | 'model' | 'starship_class' | 'manufacturer';
 
   const handleOtherInputChange = (champ: objet, key: objet | 'operateur', value: string) => {
     setState((prevState) => ({
@@ -190,7 +189,6 @@ export default function StarshipPage() {
       filteredArray = filterTextField('model', filteredArray);
       filteredArray = filterTextField('starship_class', filteredArray);
       filteredArray = filterTextField('manufacturer', filteredArray);
-      filteredArray = filterTextField('crew', filteredArray); // TODO refaire un filter pour le crew et on split les -
       filteredArray = filterByNumberField(
         'cost_in_credits',
         filter.cost_in_credits.operateur,
@@ -233,12 +231,6 @@ export default function StarshipPage() {
         filter.cargo_capacity.cargo_capacity,
         filteredArray,
       );
-      filteredArray = filterByNumberField(
-        'consumables',
-        filter.consumables.operateur,
-        filter.consumables.consumables,
-        filteredArray,
-      );
 
       if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
 
@@ -275,7 +267,7 @@ export default function StarshipPage() {
           value={state.filter.model}
           onChange={(e) => handleTextChange('model', e.target.value)}
           onClear={() => handleTextChange('model', '')}
-          placeholder="Ex: " // TODO faire un truc mieux
+          placeholder="Ex: Star Courier"
         />
         <TextInputField
           label="Starship Class"
@@ -289,7 +281,7 @@ export default function StarshipPage() {
           }}
           onChange={(e) => handleTextChange('starship_class', e.target.value)}
           onClear={() => handleTextChange('starship_class', '')}
-          placeholder="Ex: " // TODO faire un truc mieux
+          placeholder="Ex: Space Transport"
         />
         <TextInputField
           label="Manufacturer"
@@ -297,21 +289,7 @@ export default function StarshipPage() {
           value={state.filter.manufacturer}
           onChange={(e) => handleTextChange('manufacturer', e.target.value)}
           onClear={() => handleTextChange('manufacturer', '')}
-          placeholder="Ex: " // TODO faire un truc mieux
-        />
-        <TextInputField
-          label="Crew"
-          name="crew"
-          value={state.filter.crew}
-          orderBy={state.orderBy}
-          onOrderChange={() => {
-            if (state.orderBy.field === 'crew')
-              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
-            else handleOrderChange({ field: 'crew', order: true });
-          }}
-          onChange={(e) => handleTextChange('crew', e.target.value)}
-          onClear={() => handleTextChange('crew', '')}
-          placeholder="Ex: 60-200"
+          placeholder="Ex: Republic Sienar Systems"
         />
         <OtherInputField
           label="Cost In Credits"
@@ -449,23 +427,11 @@ export default function StarshipPage() {
           }
           onClear={() => handleOtherInputChange('cargo_capacity', 'cargo_capacity', '')}
         />
-        <OtherInputField
-          label="Consumables"
-          name="consumables"
-          operateur={state.filter.consumables.operateur}
-          value={state.filter.consumables.consumables}
-          type="number"
-          onOperateurChange={(e) =>
-            handleOtherInputChange('consumables', 'operateur', e.target.value)
-          }
-          onDateChange={(e) => handleOtherInputChange('consumables', 'consumables', e.target.value)}
-          onClear={() => handleOtherInputChange('consumables', 'consumables', '')}
-        />
       </div>
       <div className={style.container}>
         <h1>The Starships:</h1>
         {isLoading ? (
-          <p>Chargement...</p>
+          <p>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name} item={item} />)
         )}

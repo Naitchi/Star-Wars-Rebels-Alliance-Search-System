@@ -1,13 +1,54 @@
 .inputField {
-    .label {
-        color: darkgray;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  width: 300px;
+}
 
-    .input {
-        color: darkgray;
-    }
+.orderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 5px;
+}
 
-    .deleteBtn {
-        margin-left: '8px'
-    }
+.label {
+  margin-left: 7px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.deleteContainer {
+  margin-left: auto;
+}
+
+.deleteBtn {
+  background-color: #ff4444;
+  color: #ffffff;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.input {
+  padding: 5%;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #ffffff;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  width: 90%;
+}
+
+.input:hover {
+  border-color: #ff0000;
+}
+
+.input:focus {
+  border-color: #ff0000;
+  background-color: #444;
 }

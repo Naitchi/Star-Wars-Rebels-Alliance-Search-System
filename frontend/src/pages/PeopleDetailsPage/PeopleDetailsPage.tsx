@@ -1,81 +1,253 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // Store
-import { getAll } from '../../services/data.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPeople, setPeople } from '../../store/peopleSlice';
+import { getFilms, setFilms } from '../../store/filmsSlice';
+import { getPeople } from '../../store/peopleSlice';
+import { getPlanets, setPlanets } from '../../store/planetsSlice';
+import { getStarship, setStarship } from '../../store/starshipSlice';
+import { getVehicles, setVehicles } from '../../store/vehiclesSlice';
 
 // Components
+import Displayer from '../../components/Displayer/Displayer';
 import Header from '../../components/Header/Header';
 
 // Css
 import style from './PeopleDetailsPage.module.css';
 
+// Services
+import { getAll, getOneElement } from '../../services/data.service';
+
 // Types
-import { People } from '../../types/types';
+import { Films, People, Planet, Starship, Vehicle } from '../../types/types';
+type isLoadingType = {
+  films: boolean;
+  people: boolean;
+  planets: boolean;
+  starships: boolean;
+  vehicles: boolean;
+};
+type StateType = {
+  selectedFilms: Films[];
+  selectedPeople?: People;
+  selectedPlanets: Planet[];
+  selectedStarships: Starship[];
+  selectedVehicles: Vehicle[];
+};
 
 export default function PeopleDetailsPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<isLoadingType>({
+    films: true,
+    people: true,
+    planets: true,
+    starships: true,
+    vehicles: true,
+  });
+  const [state, setState] = useState<StateType>({
+    selectedFilms: [],
+    selectedPeople: undefined,
+    selectedPlanets: [],
+    selectedStarships: [],
+    selectedVehicles: [],
+  });
   const { id } = useParams();
-  console.log(id);
-  const peoples: People[] = useSelector(getPeople);
-  console.log('Peoplefrom state:', peoples);
-
-  const item = peoples[Number(id) - 1];
-  console.log(item);
-  // TODO mettre une redirection quand item est vide
+  const people: People[] = useSelector(getPeople);
+  const films: Films[] = useSelector(getFilms);
+  const planets: Planet[] = useSelector(getPlanets);
+  const starships: Starship[] = useSelector(getStarship);
+  const vehicles: Vehicle[] = useSelector(getVehicles);
 
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchItem = async () => {
+      setIsLoading((prevState) => ({ ...prevState, people: true }));
+      if (!id) return;
       try {
-        const response = await getAll('peoples');
-        dispatch(setPeople(response));
+        const response = (await getOneElement('people', id)) as People;
+        if (!response) {
+          navigate('/NotFound');
+        }
+        setState((prevState) => ({ ...prevState, selectedPeople: response }));
       } catch (err) {
         console.log(err);
       }
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
-
-    if (!peoples.length) {
-      fetchItems();
+    if (!people.length) fetchItem();
+    else {
+      const item: People = people.filter(
+        (item) => item.url == `https://swapi.dev/api/people/${id}/`,
+      )[0];
+      if (!item) {
+        navigate('/NotFound');
+      }
+      setState((prevState) => ({ ...prevState, selectedPeople: item }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     }
-  }, [dispatch, peoples]);
+  }, [dispatch, navigate, people, id]); // TODO voir si le endpoint remarche
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading((prevState) => ({ ...prevState, planets: true }));
+      try {
+        const response = await getAll('planets');
+        dispatch(setPlanets(response as Planet[]));
+      } catch (err) {
+        console.log(err);
+      }
+      setIsLoading((prevState) => ({ ...prevState, planets: false }));
+    };
+    const selector = () => {
+      const matchedElements: Planet[] = planets.filter(
+        (item) => item.url == state.selectedPeople?.homeworld,
+      );
+      setState((prevState) => ({ ...prevState, selectedPlanets: matchedElements }));
+    };
+    if (!planets.length) fetchItems();
+    else {
+      selector();
+      setIsLoading((prevState) => ({ ...prevState, planets: false }));
+    }
+  }, [dispatch, planets, state.selectedPeople]);
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading((prevState) => ({ ...prevState, vehicles: true }));
+      try {
+        const response = await getAll('vehicles');
+        dispatch(setVehicles(response as Vehicle[]));
+      } catch (err) {
+        console.log(err);
+      }
+      setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
+    };
+    const selector = () => {
+      if (state.selectedPeople) {
+        const selectedElements: Vehicle[] = [];
+        state.selectedPeople.vehicles.forEach((url) => {
+          const matchedVehicles = vehicles.filter((item) => item.url === url);
+          selectedElements.push(...matchedVehicles);
+        });
+        setState((prevState) => ({ ...prevState, selectedVehicles: selectedElements }));
+      }
+    };
+    if (!vehicles.length) fetchItems();
+    else {
+      selector();
+      setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
+    }
+  }, [dispatch, vehicles, state.selectedPeople]);
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading((prevState) => ({ ...prevState, starships: true }));
+      try {
+        const response = await getAll('starships');
+        dispatch(setStarship(response as Starship[]));
+      } catch (err) {
+        console.log(err);
+      }
+      setIsLoading((prevState) => ({ ...prevState, starships: false }));
+    };
+    const selector = () => {
+      if (state.selectedPeople) {
+        const selectedElements: Starship[] = [];
+        state.selectedPeople.starships.forEach((url) => {
+          const matchedElements = starships.filter((item) => item.url === url);
+          selectedElements.push(...matchedElements);
+        });
+        setState((prevState) => ({ ...prevState, selectedStarships: selectedElements }));
+      }
+    };
+    if (!starships.length) fetchItems();
+    else {
+      selector();
+      setIsLoading((prevState) => ({ ...prevState, starships: false }));
+    }
+  }, [dispatch, starships, state.selectedPeople]);
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading((prevState) => ({ ...prevState, films: true }));
+      try {
+        const response = await getAll('films');
+        dispatch(setFilms(response as Films[]));
+      } catch (err) {
+        console.log(err);
+      }
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
+    };
+    const selector = () => {
+      if (state.selectedPeople) {
+        const selectedElements: Films[] = [];
+        state.selectedPeople.films.forEach((url) => {
+          const matchedElements = films.filter((item) => item.url === url);
+          selectedElements.push(...matchedElements);
+        });
+        setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+      }
+    };
+    if (!films.length) fetchItems();
+    else {
+      selector();
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
+    }
+  }, [dispatch, films, state.selectedPeople]);
 
   return (
     <div className={style.app}>
       <Header />
-      {item && (
-        <div className={style.container}>
-          <h1>{item.name}</h1>
-          <p>
-            {/* TODO Mettre des icones Font-Awesome */}Birth Year : {item.birth_year}
-          </p>
-          {/* TODO Mettre un Carousel avec les films species starships vehicles et sa planet */}
-          <p>Eye Color: {item.eye_color}</p>
-          <p>Gender: {item.gender}</p>
-          <p>Hair Color: {item.hair_color}</p>
-          <p>Height: {item.height}</p>
-          <p>Mass: {item.mass}</p>
-          <p>Skin Color: {item.skin_color}</p>
-          <p className={style.subtext}>
-            created the{' '}
-            {new Date(item.created).toLocaleDateString('en-GB', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-          <p className={style.subtext}>
-            edited the{' '}
-            {new Date(item.edited).toLocaleDateString('en-GB', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-        </div>
+      {isLoading.people ? (
+        <p>Loading...</p>
+      ) : (
+        state.selectedPeople && (
+          <div className={style.container}>
+            <h1>{state.selectedPeople.name}</h1>
+            <p>Birth Year : {state.selectedPeople.birth_year}</p>
+            <Displayer
+              label="Films featuring this character"
+              isLoading={isLoading.films}
+              selected={state.selectedFilms}
+            />
+            <Displayer
+              label="Starships this character traveled in"
+              isLoading={isLoading.starships}
+              selected={state.selectedStarships}
+            />
+            <Displayer
+              label="Vehicles this character traveled with"
+              isLoading={isLoading.vehicles}
+              selected={state.selectedVehicles}
+            />
+            <Displayer
+              label="His homeworld"
+              isLoading={isLoading.planets}
+              selected={state.selectedPlanets}
+            />
+            <p>Eye Color: {state.selectedPeople.eye_color}</p>
+            <p>Gender: {state.selectedPeople.gender}</p>
+            <p>Hair Color: {state.selectedPeople.hair_color}</p>
+            <p>Height: {state.selectedPeople.height}</p>
+            <p>Mass: {state.selectedPeople.mass}</p>
+            <p>Skin Color: {state.selectedPeople.skin_color}</p>
+            <p className={style.subtext}>
+              created the{' '}
+              {new Date(state.selectedPeople.created).toLocaleDateString('en-GB', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+            <p className={style.subtext}>
+              edited the{' '}
+              {new Date(state.selectedPeople.edited).toLocaleDateString('en-GB', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+          </div>
+        )
       )}
     </div>
   );

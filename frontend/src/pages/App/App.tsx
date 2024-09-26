@@ -6,12 +6,12 @@ import CategoryCard from '../../components/CategoryCard/CategoryCard';
 import style from './App.module.css';
 
 const categories = [
-  { name: 'Films', url: 'films', image: '' },
-  { name: 'Vehicles', url: 'vehicles', image: '' },
-  { name: 'Species', url: 'species', image: '' },
-  { name: 'Planets', url: 'planets', image: '' },
-  { name: 'People', url: 'people', image: '' },
-  { name: 'Starship', url: 'starship', image: '' },
+  { name: 'Films', url: 'films', image: './img/affiche.jpg' },
+  { name: 'Vehicles', url: 'vehicles', image: './img/vehicle.webp' },
+  { name: 'Species', url: 'species', image: './img/species.webp' },
+  { name: 'Planets', url: 'planets', image: './img/planet.jpg' },
+  { name: 'People', url: 'people', image: './img/people.jpg' },
+  { name: 'Starship', url: 'starship', image: './img/Starship.jpg' },
 ];
 
 function App() {

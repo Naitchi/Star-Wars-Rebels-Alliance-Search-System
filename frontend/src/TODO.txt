@@ -1,0 +1,6 @@
+            DEBOUNCE
+        Documentation JsDoc + collection postman 
+    DOUBLE CHECK TOUT LES TYPAGES (faire une recherche de "=" et s'assurer que tout ai une type) 
+mettre à jour le Readme
+Factorisé le backend
+WOOKIE

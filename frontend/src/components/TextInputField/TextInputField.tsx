@@ -25,15 +25,24 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
 }) => {
   return (
     <div className={style.inputField}>
-      {orderBy && (
-        <button className={orderBy.field === name ? style.activate : ''} onClick={onOrderChange}>
-          {orderBy.field === name ? '' : '⇅'}
-          {orderBy.field === name && (orderBy.order ? '↧' : '↥')}
-        </button>
-      )}
-      <label className={style.label} htmlFor={name}>
-        {label}:
-      </label>
+      <div className={style.orderContainer}>
+        {orderBy && (
+          <button className={orderBy.field === name ? style.activate : ''} onClick={onOrderChange}>
+            {orderBy.field === name ? '' : '⇅'}
+            {orderBy.field === name && (orderBy.order ? '↧' : '↥')}
+          </button>
+        )}
+        <label className={style.label} htmlFor={name}>
+          {label}:
+        </label>
+        <div className={style.deleteContainer}>
+          {value && (
+            <button className={style.deleteBtn} onClick={onClear}>
+              X
+            </button>
+          )}
+        </div>
+      </div>
       <input
         className={style.input}
         type="text"
@@ -42,11 +51,6 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
         onChange={onChange}
         placeholder={placeholder}
       />
-      {value && (
-        <button className={style.deleteBtn} onClick={onClear}>
-          X
-        </button>
-      )}
     </div>
   );
 };

@@ -77,10 +77,9 @@ export default function VehiclePage() {
     | 'length'
     | 'passengers'
     | 'max_atmosphering_speed'
-    | 'cargo_capacity'
-    | 'consumables'; // TODO refaire ça marche pas
+    | 'cargo_capacity';
 
-  type field = 'name' | 'model' | 'vehicle_class' | 'manufacturer' | 'crew';
+  type field = 'name' | 'model' | 'vehicle_class' | 'manufacturer';
 
   const handleOtherInputChange = (champ: objet, key: objet | 'operateur', value: string) => {
     setState((prevState) => ({
@@ -181,7 +180,6 @@ export default function VehiclePage() {
       filteredArray = filterTextField('model', filteredArray);
       filteredArray = filterTextField('vehicle_class', filteredArray);
       filteredArray = filterTextField('manufacturer', filteredArray);
-      filteredArray = filterTextField('crew', filteredArray); // TODO refaire un filter pour le crew et on split les -
       filteredArray = filterByNumberField(
         'cost_in_credits',
         filter.cost_in_credits.operateur,
@@ -212,12 +210,6 @@ export default function VehiclePage() {
         filter.cargo_capacity.cargo_capacity,
         filteredArray,
       );
-      filteredArray = filterByNumberField(
-        'consumables',
-        filter.consumables.operateur,
-        filter.consumables.consumables,
-        filteredArray,
-      );
       if (orderBy.field) filteredArray = sortArray(filteredArray, orderBy.order, orderBy.field);
 
       setState((prevState) => ({
@@ -245,7 +237,7 @@ export default function VehiclePage() {
           }}
           onChange={(e) => handleTextChange('name', e.target.value)}
           onClear={() => handleTextChange('name', '')}
-          placeholder="Ex: " // TODO mettre une truc mieux
+          placeholder="Ex: Corporate Alliance tank droid"
         />
         <TextInputField
           label="Model"
@@ -253,7 +245,7 @@ export default function VehiclePage() {
           value={state.filter.model}
           onChange={(e) => handleTextChange('model', e.target.value)}
           onClear={() => handleTextChange('model', '')}
-          placeholder="Ex: " // TODO mettre une truc mieux
+          placeholder="Ex: NR-N99 Persuader-class droid enforcer"
         />
         <TextInputField
           label="Vehicle Class"
@@ -267,7 +259,7 @@ export default function VehiclePage() {
           }}
           onChange={(e) => handleTextChange('vehicle_class', e.target.value)}
           onClear={() => handleTextChange('vehicle_class', '')}
-          placeholder="Ex:  " // TODO mettre une truc mieux
+          placeholder="Ex: droid tank"
         />
         <TextInputField
           label="Manufacturer"
@@ -275,21 +267,7 @@ export default function VehiclePage() {
           value={state.filter.manufacturer}
           onChange={(e) => handleTextChange('manufacturer', e.target.value)}
           onClear={() => handleTextChange('manufacturer', '')}
-          placeholder="Ex: " // TODO mettre une truc mieux
-        />
-        <TextInputField
-          label="Crew"
-          name="crew"
-          value={state.filter.crew}
-          orderBy={state.orderBy}
-          onOrderChange={() => {
-            if (state.orderBy.field === 'crew')
-              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
-            else handleOrderChange({ field: 'crew', order: true });
-          }}
-          onChange={(e) => handleTextChange('crew', e.target.value)}
-          onClear={() => handleTextChange('crew', '')}
-          placeholder="Ex: 1-2"
+          placeholder="Ex: Techno Union"
         />
         <OtherInputField
           label="Cost In Credits"
@@ -395,23 +373,11 @@ export default function VehiclePage() {
           }
           onClear={() => handleOtherInputChange('cargo_capacity', 'cargo_capacity', '')}
         />
-        <OtherInputField
-          label="Consumables"
-          name="consumables"
-          operateur={state.filter.consumables.operateur}
-          value={state.filter.consumables.consumables}
-          type="number"
-          onOperateurChange={(e) =>
-            handleOtherInputChange('consumables', 'consumables', e.target.value)
-          }
-          onDateChange={(e) => handleOtherInputChange('consumables', 'consumables', e.target.value)}
-          onClear={() => handleOtherInputChange('consumables', 'consumables', '')}
-        />
       </div>
       <div className={style.container}>
         <h1>The Vehicles:</h1>
         {isLoading ? (
-          <p>Chargement...</p>
+          <p>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name} item={item} />)
         )}

@@ -1,0 +1,25 @@
+.displayerContainer {
+  margin: 20px;
+}
+
+.label {
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.loadingText,
+.noneText {
+  color: #ffffff;
+}
+
+.contentContainer:hover {
+  padding: 10px;
+  border-radius: 5px;
+}

@@ -17,6 +17,7 @@ import StarshipDetailsPage from './pages/StarshipDetailsPage/StarshipDetailsPage
 import StarshipPage from './pages/StarshipPage/StarshipPage';
 import VehicleDetailsPage from './pages/VehicleDetailsPage/VehicleDetailsPage';
 import VehiclesPage from './pages/VehiclesPage/VehiclesPage';
+import SignIn from './pages/SignIn/SignIn';
 
 // CSS
 import './assets/css/index.css';
@@ -24,6 +25,7 @@ import './assets/css/index.css';
 import { Provider } from 'react-redux';
 import store from './store/index';
 import AllCategories from './pages/AllCategories/AllCategories';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 // Configuration des routes avec React Router
 const router = createBrowserRouter([
@@ -33,55 +35,112 @@ const router = createBrowserRouter([
   },
   {
     path: '/all',
-    element: <AllCategories />,
+    element: (
+      <ProtectedRoute>
+        <AllCategories />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/films',
-    element: <FilmsPage />,
+    element: (
+      <ProtectedRoute>
+        <FilmsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/films/:id',
-    element: <FilmDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <FilmDetailsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/people',
-    element: <PeoplePage />,
+    element: (
+      <ProtectedRoute>
+        <PeoplePage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/people/:id',
-    element: <PeopleDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <PeopleDetailsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/planets',
-    element: <PlanetsPage />,
+    element: (
+      <ProtectedRoute>
+        <PlanetsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/planets/:id',
-    element: <PlanetDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <PlanetDetailsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/species',
-    element: <SpeciesPage />,
+    element: (
+      <ProtectedRoute>
+        <SpeciesPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/species/:id',
-    element: <SpecieDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <SpecieDetailsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/starships',
-    element: <StarshipPage />,
+    element: (
+      <ProtectedRoute>
+        <StarshipPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/starships/:id',
-    element: <StarshipDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <StarshipDetailsPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/vehicles',
-    element: <VehiclesPage />,
+
+    element: (
+      <ProtectedRoute>
+        <VehiclesPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/vehicles/:id',
-    element: <VehicleDetailsPage />,
+    element: (
+      <ProtectedRoute>
+        <VehicleDetailsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/signin',
+    element: <SignIn />,
   },
   {
     path: '*',

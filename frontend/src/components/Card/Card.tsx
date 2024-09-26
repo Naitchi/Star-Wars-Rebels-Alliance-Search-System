@@ -14,8 +14,12 @@ export default function Card(
   };
 
   return (
-    <Link className={style.link} to={`/${extractIdFromUrl(props.item.url)}`}>
-      <h2>{'title' in props.item ? props.item.title : props.item.name}</h2>
-    </Link>
+    <div className={style.linkContainer}>
+      <Link className={style.link} to={`/${extractIdFromUrl(props.item.url)}`}>
+        <h2 className={style.title}>
+          {'title' in props.item ? props.item.title : props.item.name}
+        </h2>
+      </Link>
+    </div>
   );
 }

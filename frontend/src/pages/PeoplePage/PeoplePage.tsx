@@ -250,34 +250,6 @@ export default function PeoplePage() {
           onClear={() => handleTextChange('hair_color', '')}
           placeholder="Ex: brown"
         />
-
-        <OtherInputField // TODO changer car les dates c'est "22BDD" (clc)
-          label="Birth Year"
-          name="birth_year"
-          operateur={state.filter.birth_year.operateur}
-          value={state.filter.birth_year.birth_year}
-          orderBy={state.orderBy}
-          onOrderChange={() => {
-            if (state.orderBy.field === 'birth_year')
-              handleOrderChange({ ...state.orderBy, order: !state.orderBy.order });
-            else handleOrderChange({ field: 'birth_year', order: true });
-          }}
-          type="date"
-          onOperateurChange={(e) =>
-            handleOtherInputChange('birth_year', 'operateur', e.target.value)
-          }
-          onDateChange={(e) => handleOtherInputChange('birth_year', 'birth_year', e.target.value)}
-          onClear={() => handleOtherInputChange('birth_year', 'birth_year', '')}
-        />
-
-        <TextInputField // TODO à changer
-          label="Homeworld"
-          name="homeworld"
-          value={state.filter.homeworld}
-          onChange={(e) => handleTextChange('homeworld', e.target.value)}
-          onClear={() => handleTextChange('homeworld', '')}
-          placeholder="Ex: Earth"
-        />
         <SelectInputField
           label="Gender"
           name="gender"
@@ -330,7 +302,7 @@ export default function PeoplePage() {
       <div className={style.container}>
         <h1>The Peoples:</h1>
         {isLoading ? (
-          <p>Chargement...</p>
+          <p>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name} item={item} />)
         )}

@@ -1,36 +1,30 @@
-.thumb {
-    border-radius: 10px;
-    height: 300px;
-    width: 300px;
-    padding: 20px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
+.linkContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.thumb h2 {
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 142.6%;
-    color: #ffffff;
-    text-align: start;
+.link {
+  text-decoration: none;
+  color: #ff0000;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-@media screen and (max-width: 600px) {
-    .thumb {
-        height: 255px;
-        width: unset;
-        padding: 19px;
-    }
+.link:hover {
+  color: #ff4444;
+  transform: scale(1.05);
+}
 
-    .thumb h2 {
-        font-weight: 500;
-        font-size: 18px;
-    }
+.title {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 142.6%;
+  color: #ffffff;
+  text-align: center;
+  transition: color 0.3s ease;
+}
 
-    .link {
-        width: 90%;
-    }
+.link:hover .title {
+  color: #ff4444;
 }

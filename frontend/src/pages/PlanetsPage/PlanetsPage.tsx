@@ -262,7 +262,7 @@ export default function PlanetsPage() {
       <div className={style.container}>
         <h1>The Planets:</h1>
         {isLoading ? (
-          <p>Chargement...</p>
+          <p>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name} item={item} />)
         )}

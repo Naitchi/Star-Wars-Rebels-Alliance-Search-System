@@ -1,0 +1,39 @@
+.page {
+  background-color: #121212;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.body {
+  text-align: center;
+  color: #ffffff;
+}
+
+h1 {
+  font-size: 100px;
+  margin: 0;
+}
+
+h2 {
+  font-size: 24px;
+  margin: 10px 0;
+}
+
+.link {
+  color: #ff4444;
+  text-decoration: none;
+  font-size: 18px;
+  margin-top: 20px;
+  display: inline-block;
+  padding: 10px 20px;
+  border: 2px solid #ff4444;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.link:hover {
+  background-color: #ff4444;
+  color: #ffffff;
+}

@@ -33,42 +33,48 @@ const OtherInputField: React.FC<OtherInputFieldProps> = ({
 }) => {
   return (
     <div className={style.inputField}>
-      {orderBy && (
-        <button className={orderBy.field === name ? style.activate : ''} onClick={onOrderChange}>
-          {orderBy.field === name ? '' : '⇅'}
-          {orderBy.field === name && (orderBy.order ? '↧' : '↥')}
-        </button>
-      )}
-      <label className={style.label} htmlFor={name}>
-        {label}:
-      </label>
-      <select
-        className={style.select}
-        value={operateur}
-        onChange={onOperateurChange}
-        name="operateur"
-        id={name}
-      >
-        <option value="<">&lt;</option>
-        <option value=">">&gt;</option>
-        <option value="=">=</option>
-        <option value="<=">&lt;=</option>
-        <option value=">=">&gt;=</option>
-      </select>
-      <input
-        className={style.input}
-        min={min ?? 0}
-        max={max ?? undefined}
-        type={type}
-        id={name}
-        value={value ?? ''}
-        onChange={onDateChange}
-      />
-      {value && (
-        <button onClick={onClear} className={style.deleteBtn}>
-          X
-        </button>
-      )}
+      <div className={style.orderContainer}>
+        {orderBy && (
+          <button className={orderBy.field === name ? style.activate : ''} onClick={onOrderChange}>
+            {orderBy.field === name ? '' : '⇅'}
+            {orderBy.field === name && (orderBy.order ? '↧' : '↥')}
+          </button>
+        )}
+        <label className={style.label} htmlFor={name}>
+          {label}:
+        </label>
+        <div className={style.deleteContainer}>
+          {value && (
+            <button onClick={onClear} className={style.deleteBtn}>
+              X
+            </button>
+          )}
+        </div>
+      </div>
+      <div className={style.inputContainer}>
+        <select
+          className={style.select}
+          value={operateur}
+          onChange={onOperateurChange}
+          name="operateur"
+          id={name}
+        >
+          <option value="<">&lt;</option>
+          <option value=">">&gt;</option>
+          <option value="=">=</option>
+          <option value="<=">&lt;=</option>
+          <option value=">=">&gt;=</option>
+        </select>
+        <input
+          className={style.input}
+          min={min ?? 0}
+          max={max ?? undefined}
+          type={type}
+          id={name}
+          value={value ?? ''}
+          onChange={onDateChange}
+        />
+      </div>
     </div>
   );
 };
