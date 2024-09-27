@@ -246,7 +246,7 @@ export default function AllCategories() {
         </div>
 
         {isLoading ? (
-          <p className={style.loadingText}>Chargement...</p>
+          <p className={style.loadingText}>Loading...</p>
         ) : (
           state.filteredItems.map((item) => <Card key={item.name ?? item.title} item={item} />)
         )}
