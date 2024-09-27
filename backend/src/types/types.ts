@@ -108,3 +108,4 @@ export interface Planet {
 }
 
 export type Items = Vehicle[] | People[] | Starship[] | Films[] | Planet[] | Species[];
+export type Item = Vehicle | People | Starship | Films | Planet | Species;

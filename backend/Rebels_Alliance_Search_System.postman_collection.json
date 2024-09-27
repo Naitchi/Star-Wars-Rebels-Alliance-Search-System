@@ -1,0 +1,702 @@
+{
+	"info": {
+		"_postman_id": "0599c1fd-7cab-46a7-b921-81aae643f7d4",
+		"name": "Fastory",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12976432"
+	},
+	"item": [
+		{
+			"name": "status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Réussite",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"status"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "63"
+						},
+						{
+							"key": "accept-ranges",
+							"value": "bytes"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 26 Sep 2024 21:16:57 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"OK\",\n    \"message\": \"Le serveur fonctionne correctement!\"\n}"
+				}
+			]
+		},
+		{
+			"name": "getAllFromACategory",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikx1a2UiLCJpYXQiOjE3MjczODU0MjV9.XQRx3TcLdD85qLx3PaiQqm0FAZmjxUEEEPIf0ioJ4Io",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/categories/species",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"categories",
+						"species"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Réussite",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/categories/films",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"categories",
+								"films"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin,accept-encoding"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 25 Sep 2024 09:21:07 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"title\": \"A New Hope\",\n        \"episode_id\": 4,\n        \"opening_crawl\": \"It is a period of civil war.\\r\\nRebel spaceships, striking\\r\\nfrom a hidden base, have won\\r\\ntheir first victory against\\r\\nthe evil Galactic Empire.\\r\\n\\r\\nDuring the battle, Rebel\\r\\nspies managed to steal secret\\r\\nplans to the Empire's\\r\\nultimate weapon, the DEATH\\r\\nSTAR, an armored space\\r\\nstation with enough power\\r\\nto destroy an entire planet.\\r\\n\\r\\nPursued by the Empire's\\r\\nsinister agents, Princess\\r\\nLeia races home aboard her\\r\\nstarship, custodian of the\\r\\nstolen plans that can save her\\r\\npeople and restore\\r\\nfreedom to the galaxy....\",\n        \"director\": \"George Lucas\",\n        \"producer\": \"Gary Kurtz, Rick McCallum\",\n        \"release_date\": \"1977-05-25\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/1/\",\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/4/\",\n            \"https://swapi.dev/api/people/5/\",\n            \"https://swapi.dev/api/people/6/\",\n            \"https://swapi.dev/api/people/7/\",\n            \"https://swapi.dev/api/people/8/\",\n            \"https://swapi.dev/api/people/9/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/12/\",\n            \"https://swapi.dev/api/people/13/\",\n            \"https://swapi.dev/api/people/14/\",\n            \"https://swapi.dev/api/people/15/\",\n            \"https://swapi.dev/api/people/16/\",\n            \"https://swapi.dev/api/people/18/\",\n            \"https://swapi.dev/api/people/19/\",\n            \"https://swapi.dev/api/people/81/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/1/\",\n            \"https://swapi.dev/api/planets/2/\",\n            \"https://swapi.dev/api/planets/3/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/2/\",\n            \"https://swapi.dev/api/starships/3/\",\n            \"https://swapi.dev/api/starships/5/\",\n            \"https://swapi.dev/api/starships/9/\",\n            \"https://swapi.dev/api/starships/10/\",\n            \"https://swapi.dev/api/starships/11/\",\n            \"https://swapi.dev/api/starships/12/\",\n            \"https://swapi.dev/api/starships/13/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/4/\",\n            \"https://swapi.dev/api/vehicles/6/\",\n            \"https://swapi.dev/api/vehicles/7/\",\n            \"https://swapi.dev/api/vehicles/8/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/3/\",\n            \"https://swapi.dev/api/species/4/\",\n            \"https://swapi.dev/api/species/5/\"\n        ],\n        \"created\": \"2014-12-10T14:23:31.880000Z\",\n        \"edited\": \"2014-12-20T19:49:45.256000Z\",\n        \"url\": \"https://swapi.dev/api/films/1/\"\n    },\n    {\n        \"title\": \"The Empire Strikes Back\",\n        \"episode_id\": 5,\n        \"opening_crawl\": \"It is a dark time for the\\r\\nRebellion. Although the Death\\r\\nStar has been destroyed,\\r\\nImperial troops have driven the\\r\\nRebel forces from their hidden\\r\\nbase and pursued them across\\r\\nthe galaxy.\\r\\n\\r\\nEvading the dreaded Imperial\\r\\nStarfleet, a group of freedom\\r\\nfighters led by Luke Skywalker\\r\\nhas established a new secret\\r\\nbase on the remote ice world\\r\\nof Hoth.\\r\\n\\r\\nThe evil lord Darth Vader,\\r\\nobsessed with finding young\\r\\nSkywalker, has dispatched\\r\\nthousands of remote probes into\\r\\nthe far reaches of space....\",\n        \"director\": \"Irvin Kershner\",\n        \"producer\": \"Gary Kurtz, Rick McCallum\",\n        \"release_date\": \"1980-05-17\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/1/\",\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/4/\",\n            \"https://swapi.dev/api/people/5/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/13/\",\n            \"https://swapi.dev/api/people/14/\",\n            \"https://swapi.dev/api/people/18/\",\n            \"https://swapi.dev/api/people/20/\",\n            \"https://swapi.dev/api/people/21/\",\n            \"https://swapi.dev/api/people/22/\",\n            \"https://swapi.dev/api/people/23/\",\n            \"https://swapi.dev/api/people/24/\",\n            \"https://swapi.dev/api/people/25/\",\n            \"https://swapi.dev/api/people/26/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/4/\",\n            \"https://swapi.dev/api/planets/5/\",\n            \"https://swapi.dev/api/planets/6/\",\n            \"https://swapi.dev/api/planets/27/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/3/\",\n            \"https://swapi.dev/api/starships/10/\",\n            \"https://swapi.dev/api/starships/11/\",\n            \"https://swapi.dev/api/starships/12/\",\n            \"https://swapi.dev/api/starships/15/\",\n            \"https://swapi.dev/api/starships/17/\",\n            \"https://swapi.dev/api/starships/21/\",\n            \"https://swapi.dev/api/starships/22/\",\n            \"https://swapi.dev/api/starships/23/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/8/\",\n            \"https://swapi.dev/api/vehicles/14/\",\n            \"https://swapi.dev/api/vehicles/16/\",\n            \"https://swapi.dev/api/vehicles/18/\",\n            \"https://swapi.dev/api/vehicles/19/\",\n            \"https://swapi.dev/api/vehicles/20/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/3/\",\n            \"https://swapi.dev/api/species/6/\",\n            \"https://swapi.dev/api/species/7/\"\n        ],\n        \"created\": \"2014-12-12T11:26:24.656000Z\",\n        \"edited\": \"2014-12-15T13:07:53.386000Z\",\n        \"url\": \"https://swapi.dev/api/films/2/\"\n    },\n    {\n        \"title\": \"Return of the Jedi\",\n        \"episode_id\": 6,\n        \"opening_crawl\": \"Luke Skywalker has returned to\\r\\nhis home planet of Tatooine in\\r\\nan attempt to rescue his\\r\\nfriend Han Solo from the\\r\\nclutches of the vile gangster\\r\\nJabba the Hutt.\\r\\n\\r\\nLittle does Luke know that the\\r\\nGALACTIC EMPIRE has secretly\\r\\nbegun construction on a new\\r\\narmored space station even\\r\\nmore powerful than the first\\r\\ndreaded Death Star.\\r\\n\\r\\nWhen completed, this ultimate\\r\\nweapon will spell certain doom\\r\\nfor the small band of rebels\\r\\nstruggling to restore freedom\\r\\nto the galaxy...\",\n        \"director\": \"Richard Marquand\",\n        \"producer\": \"Howard G. Kazanjian, George Lucas, Rick McCallum\",\n        \"release_date\": \"1983-05-25\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/1/\",\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/4/\",\n            \"https://swapi.dev/api/people/5/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/13/\",\n            \"https://swapi.dev/api/people/14/\",\n            \"https://swapi.dev/api/people/16/\",\n            \"https://swapi.dev/api/people/18/\",\n            \"https://swapi.dev/api/people/20/\",\n            \"https://swapi.dev/api/people/21/\",\n            \"https://swapi.dev/api/people/22/\",\n            \"https://swapi.dev/api/people/25/\",\n            \"https://swapi.dev/api/people/27/\",\n            \"https://swapi.dev/api/people/28/\",\n            \"https://swapi.dev/api/people/29/\",\n            \"https://swapi.dev/api/people/30/\",\n            \"https://swapi.dev/api/people/31/\",\n            \"https://swapi.dev/api/people/45/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/1/\",\n            \"https://swapi.dev/api/planets/5/\",\n            \"https://swapi.dev/api/planets/7/\",\n            \"https://swapi.dev/api/planets/8/\",\n            \"https://swapi.dev/api/planets/9/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/2/\",\n            \"https://swapi.dev/api/starships/3/\",\n            \"https://swapi.dev/api/starships/10/\",\n            \"https://swapi.dev/api/starships/11/\",\n            \"https://swapi.dev/api/starships/12/\",\n            \"https://swapi.dev/api/starships/15/\",\n            \"https://swapi.dev/api/starships/17/\",\n            \"https://swapi.dev/api/starships/22/\",\n            \"https://swapi.dev/api/starships/23/\",\n            \"https://swapi.dev/api/starships/27/\",\n            \"https://swapi.dev/api/starships/28/\",\n            \"https://swapi.dev/api/starships/29/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/8/\",\n            \"https://swapi.dev/api/vehicles/16/\",\n            \"https://swapi.dev/api/vehicles/18/\",\n            \"https://swapi.dev/api/vehicles/19/\",\n            \"https://swapi.dev/api/vehicles/24/\",\n            \"https://swapi.dev/api/vehicles/25/\",\n            \"https://swapi.dev/api/vehicles/26/\",\n            \"https://swapi.dev/api/vehicles/30/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/3/\",\n            \"https://swapi.dev/api/species/5/\",\n            \"https://swapi.dev/api/species/6/\",\n            \"https://swapi.dev/api/species/8/\",\n            \"https://swapi.dev/api/species/9/\",\n            \"https://swapi.dev/api/species/10/\",\n            \"https://swapi.dev/api/species/15/\"\n        ],\n        \"created\": \"2014-12-18T10:39:33.255000Z\",\n        \"edited\": \"2014-12-20T09:48:37.462000Z\",\n        \"url\": \"https://swapi.dev/api/films/3/\"\n    },\n    {\n        \"title\": \"The Phantom Menace\",\n        \"episode_id\": 1,\n        \"opening_crawl\": \"Turmoil has engulfed the\\r\\nGalactic Republic. The taxation\\r\\nof trade routes to outlying star\\r\\nsystems is in dispute.\\r\\n\\r\\nHoping to resolve the matter\\r\\nwith a blockade of deadly\\r\\nbattleships, the greedy Trade\\r\\nFederation has stopped all\\r\\nshipping to the small planet\\r\\nof Naboo.\\r\\n\\r\\nWhile the Congress of the\\r\\nRepublic endlessly debates\\r\\nthis alarming chain of events,\\r\\nthe Supreme Chancellor has\\r\\nsecretly dispatched two Jedi\\r\\nKnights, the guardians of\\r\\npeace and justice in the\\r\\ngalaxy, to settle the conflict....\",\n        \"director\": \"George Lucas\",\n        \"producer\": \"Rick McCallum\",\n        \"release_date\": \"1999-05-19\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/11/\",\n            \"https://swapi.dev/api/people/16/\",\n            \"https://swapi.dev/api/people/20/\",\n            \"https://swapi.dev/api/people/21/\",\n            \"https://swapi.dev/api/people/32/\",\n            \"https://swapi.dev/api/people/33/\",\n            \"https://swapi.dev/api/people/34/\",\n            \"https://swapi.dev/api/people/35/\",\n            \"https://swapi.dev/api/people/36/\",\n            \"https://swapi.dev/api/people/37/\",\n            \"https://swapi.dev/api/people/38/\",\n            \"https://swapi.dev/api/people/39/\",\n            \"https://swapi.dev/api/people/40/\",\n            \"https://swapi.dev/api/people/41/\",\n            \"https://swapi.dev/api/people/42/\",\n            \"https://swapi.dev/api/people/43/\",\n            \"https://swapi.dev/api/people/44/\",\n            \"https://swapi.dev/api/people/46/\",\n            \"https://swapi.dev/api/people/47/\",\n            \"https://swapi.dev/api/people/48/\",\n            \"https://swapi.dev/api/people/49/\",\n            \"https://swapi.dev/api/people/50/\",\n            \"https://swapi.dev/api/people/51/\",\n            \"https://swapi.dev/api/people/52/\",\n            \"https://swapi.dev/api/people/53/\",\n            \"https://swapi.dev/api/people/54/\",\n            \"https://swapi.dev/api/people/55/\",\n            \"https://swapi.dev/api/people/56/\",\n            \"https://swapi.dev/api/people/57/\",\n            \"https://swapi.dev/api/people/58/\",\n            \"https://swapi.dev/api/people/59/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/1/\",\n            \"https://swapi.dev/api/planets/8/\",\n            \"https://swapi.dev/api/planets/9/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/31/\",\n            \"https://swapi.dev/api/starships/32/\",\n            \"https://swapi.dev/api/starships/39/\",\n            \"https://swapi.dev/api/starships/40/\",\n            \"https://swapi.dev/api/starships/41/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/33/\",\n            \"https://swapi.dev/api/vehicles/34/\",\n            \"https://swapi.dev/api/vehicles/35/\",\n            \"https://swapi.dev/api/vehicles/36/\",\n            \"https://swapi.dev/api/vehicles/37/\",\n            \"https://swapi.dev/api/vehicles/38/\",\n            \"https://swapi.dev/api/vehicles/42/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/6/\",\n            \"https://swapi.dev/api/species/11/\",\n            \"https://swapi.dev/api/species/12/\",\n            \"https://swapi.dev/api/species/13/\",\n            \"https://swapi.dev/api/species/14/\",\n            \"https://swapi.dev/api/species/15/\",\n            \"https://swapi.dev/api/species/16/\",\n            \"https://swapi.dev/api/species/17/\",\n            \"https://swapi.dev/api/species/18/\",\n            \"https://swapi.dev/api/species/19/\",\n            \"https://swapi.dev/api/species/20/\",\n            \"https://swapi.dev/api/species/21/\",\n            \"https://swapi.dev/api/species/22/\",\n            \"https://swapi.dev/api/species/23/\",\n            \"https://swapi.dev/api/species/24/\",\n            \"https://swapi.dev/api/species/25/\",\n            \"https://swapi.dev/api/species/26/\",\n            \"https://swapi.dev/api/species/27/\"\n        ],\n        \"created\": \"2014-12-19T16:52:55.740000Z\",\n        \"edited\": \"2014-12-20T10:54:07.216000Z\",\n        \"url\": \"https://swapi.dev/api/films/4/\"\n    },\n    {\n        \"title\": \"Attack of the Clones\",\n        \"episode_id\": 2,\n        \"opening_crawl\": \"There is unrest in the Galactic\\r\\nSenate. Several thousand solar\\r\\nsystems have declared their\\r\\nintentions to leave the Republic.\\r\\n\\r\\nThis separatist movement,\\r\\nunder the leadership of the\\r\\nmysterious Count Dooku, has\\r\\nmade it difficult for the limited\\r\\nnumber of Jedi Knights to maintain \\r\\npeace and order in the galaxy.\\r\\n\\r\\nSenator Amidala, the former\\r\\nQueen of Naboo, is returning\\r\\nto the Galactic Senate to vote\\r\\non the critical issue of creating\\r\\nan ARMY OF THE REPUBLIC\\r\\nto assist the overwhelmed\\r\\nJedi....\",\n        \"director\": \"George Lucas\",\n        \"producer\": \"Rick McCallum\",\n        \"release_date\": \"2002-05-16\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/6/\",\n            \"https://swapi.dev/api/people/7/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/11/\",\n            \"https://swapi.dev/api/people/20/\",\n            \"https://swapi.dev/api/people/21/\",\n            \"https://swapi.dev/api/people/22/\",\n            \"https://swapi.dev/api/people/33/\",\n            \"https://swapi.dev/api/people/35/\",\n            \"https://swapi.dev/api/people/36/\",\n            \"https://swapi.dev/api/people/40/\",\n            \"https://swapi.dev/api/people/43/\",\n            \"https://swapi.dev/api/people/46/\",\n            \"https://swapi.dev/api/people/51/\",\n            \"https://swapi.dev/api/people/52/\",\n            \"https://swapi.dev/api/people/53/\",\n            \"https://swapi.dev/api/people/58/\",\n            \"https://swapi.dev/api/people/59/\",\n            \"https://swapi.dev/api/people/60/\",\n            \"https://swapi.dev/api/people/61/\",\n            \"https://swapi.dev/api/people/62/\",\n            \"https://swapi.dev/api/people/63/\",\n            \"https://swapi.dev/api/people/64/\",\n            \"https://swapi.dev/api/people/65/\",\n            \"https://swapi.dev/api/people/66/\",\n            \"https://swapi.dev/api/people/67/\",\n            \"https://swapi.dev/api/people/68/\",\n            \"https://swapi.dev/api/people/69/\",\n            \"https://swapi.dev/api/people/70/\",\n            \"https://swapi.dev/api/people/71/\",\n            \"https://swapi.dev/api/people/72/\",\n            \"https://swapi.dev/api/people/73/\",\n            \"https://swapi.dev/api/people/74/\",\n            \"https://swapi.dev/api/people/75/\",\n            \"https://swapi.dev/api/people/76/\",\n            \"https://swapi.dev/api/people/77/\",\n            \"https://swapi.dev/api/people/78/\",\n            \"https://swapi.dev/api/people/82/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/1/\",\n            \"https://swapi.dev/api/planets/8/\",\n            \"https://swapi.dev/api/planets/9/\",\n            \"https://swapi.dev/api/planets/10/\",\n            \"https://swapi.dev/api/planets/11/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/21/\",\n            \"https://swapi.dev/api/starships/32/\",\n            \"https://swapi.dev/api/starships/39/\",\n            \"https://swapi.dev/api/starships/43/\",\n            \"https://swapi.dev/api/starships/47/\",\n            \"https://swapi.dev/api/starships/48/\",\n            \"https://swapi.dev/api/starships/49/\",\n            \"https://swapi.dev/api/starships/52/\",\n            \"https://swapi.dev/api/starships/58/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/4/\",\n            \"https://swapi.dev/api/vehicles/44/\",\n            \"https://swapi.dev/api/vehicles/45/\",\n            \"https://swapi.dev/api/vehicles/46/\",\n            \"https://swapi.dev/api/vehicles/50/\",\n            \"https://swapi.dev/api/vehicles/51/\",\n            \"https://swapi.dev/api/vehicles/53/\",\n            \"https://swapi.dev/api/vehicles/54/\",\n            \"https://swapi.dev/api/vehicles/55/\",\n            \"https://swapi.dev/api/vehicles/56/\",\n            \"https://swapi.dev/api/vehicles/57/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/6/\",\n            \"https://swapi.dev/api/species/12/\",\n            \"https://swapi.dev/api/species/13/\",\n            \"https://swapi.dev/api/species/15/\",\n            \"https://swapi.dev/api/species/28/\",\n            \"https://swapi.dev/api/species/29/\",\n            \"https://swapi.dev/api/species/30/\",\n            \"https://swapi.dev/api/species/31/\",\n            \"https://swapi.dev/api/species/32/\",\n            \"https://swapi.dev/api/species/33/\",\n            \"https://swapi.dev/api/species/34/\",\n            \"https://swapi.dev/api/species/35/\"\n        ],\n        \"created\": \"2014-12-20T10:57:57.886000Z\",\n        \"edited\": \"2014-12-20T20:18:48.516000Z\",\n        \"url\": \"https://swapi.dev/api/films/5/\"\n    },\n    {\n        \"title\": \"Revenge of the Sith\",\n        \"episode_id\": 3,\n        \"opening_crawl\": \"War! The Republic is crumbling\\r\\nunder attacks by the ruthless\\r\\nSith Lord, Count Dooku.\\r\\nThere are heroes on both sides.\\r\\nEvil is everywhere.\\r\\n\\r\\nIn a stunning move, the\\r\\nfiendish droid leader, General\\r\\nGrievous, has swept into the\\r\\nRepublic capital and kidnapped\\r\\nChancellor Palpatine, leader of\\r\\nthe Galactic Senate.\\r\\n\\r\\nAs the Separatist Droid Army\\r\\nattempts to flee the besieged\\r\\ncapital with their valuable\\r\\nhostage, two Jedi Knights lead a\\r\\ndesperate mission to rescue the\\r\\ncaptive Chancellor....\",\n        \"director\": \"George Lucas\",\n        \"producer\": \"Rick McCallum\",\n        \"release_date\": \"2005-05-19\",\n        \"characters\": [\n            \"https://swapi.dev/api/people/1/\",\n            \"https://swapi.dev/api/people/2/\",\n            \"https://swapi.dev/api/people/3/\",\n            \"https://swapi.dev/api/people/4/\",\n            \"https://swapi.dev/api/people/5/\",\n            \"https://swapi.dev/api/people/6/\",\n            \"https://swapi.dev/api/people/7/\",\n            \"https://swapi.dev/api/people/10/\",\n            \"https://swapi.dev/api/people/11/\",\n            \"https://swapi.dev/api/people/12/\",\n            \"https://swapi.dev/api/people/13/\",\n            \"https://swapi.dev/api/people/20/\",\n            \"https://swapi.dev/api/people/21/\",\n            \"https://swapi.dev/api/people/33/\",\n            \"https://swapi.dev/api/people/35/\",\n            \"https://swapi.dev/api/people/46/\",\n            \"https://swapi.dev/api/people/51/\",\n            \"https://swapi.dev/api/people/52/\",\n            \"https://swapi.dev/api/people/53/\",\n            \"https://swapi.dev/api/people/54/\",\n            \"https://swapi.dev/api/people/55/\",\n            \"https://swapi.dev/api/people/56/\",\n            \"https://swapi.dev/api/people/58/\",\n            \"https://swapi.dev/api/people/63/\",\n            \"https://swapi.dev/api/people/64/\",\n            \"https://swapi.dev/api/people/67/\",\n            \"https://swapi.dev/api/people/68/\",\n            \"https://swapi.dev/api/people/75/\",\n            \"https://swapi.dev/api/people/78/\",\n            \"https://swapi.dev/api/people/79/\",\n            \"https://swapi.dev/api/people/80/\",\n            \"https://swapi.dev/api/people/81/\",\n            \"https://swapi.dev/api/people/82/\",\n            \"https://swapi.dev/api/people/83/\"\n        ],\n        \"planets\": [\n            \"https://swapi.dev/api/planets/1/\",\n            \"https://swapi.dev/api/planets/2/\",\n            \"https://swapi.dev/api/planets/5/\",\n            \"https://swapi.dev/api/planets/8/\",\n            \"https://swapi.dev/api/planets/9/\",\n            \"https://swapi.dev/api/planets/12/\",\n            \"https://swapi.dev/api/planets/13/\",\n            \"https://swapi.dev/api/planets/14/\",\n            \"https://swapi.dev/api/planets/15/\",\n            \"https://swapi.dev/api/planets/16/\",\n            \"https://swapi.dev/api/planets/17/\",\n            \"https://swapi.dev/api/planets/18/\",\n            \"https://swapi.dev/api/planets/19/\"\n        ],\n        \"starships\": [\n            \"https://swapi.dev/api/starships/2/\",\n            \"https://swapi.dev/api/starships/32/\",\n            \"https://swapi.dev/api/starships/48/\",\n            \"https://swapi.dev/api/starships/59/\",\n            \"https://swapi.dev/api/starships/61/\",\n            \"https://swapi.dev/api/starships/63/\",\n            \"https://swapi.dev/api/starships/64/\",\n            \"https://swapi.dev/api/starships/65/\",\n            \"https://swapi.dev/api/starships/66/\",\n            \"https://swapi.dev/api/starships/68/\",\n            \"https://swapi.dev/api/starships/74/\",\n            \"https://swapi.dev/api/starships/75/\"\n        ],\n        \"vehicles\": [\n            \"https://swapi.dev/api/vehicles/33/\",\n            \"https://swapi.dev/api/vehicles/50/\",\n            \"https://swapi.dev/api/vehicles/53/\",\n            \"https://swapi.dev/api/vehicles/56/\",\n            \"https://swapi.dev/api/vehicles/60/\",\n            \"https://swapi.dev/api/vehicles/62/\",\n            \"https://swapi.dev/api/vehicles/67/\",\n            \"https://swapi.dev/api/vehicles/69/\",\n            \"https://swapi.dev/api/vehicles/70/\",\n            \"https://swapi.dev/api/vehicles/71/\",\n            \"https://swapi.dev/api/vehicles/72/\",\n            \"https://swapi.dev/api/vehicles/73/\",\n            \"https://swapi.dev/api/vehicles/76/\"\n        ],\n        \"species\": [\n            \"https://swapi.dev/api/species/1/\",\n            \"https://swapi.dev/api/species/2/\",\n            \"https://swapi.dev/api/species/3/\",\n            \"https://swapi.dev/api/species/6/\",\n            \"https://swapi.dev/api/species/15/\",\n            \"https://swapi.dev/api/species/19/\",\n            \"https://swapi.dev/api/species/20/\",\n            \"https://swapi.dev/api/species/23/\",\n            \"https://swapi.dev/api/species/24/\",\n            \"https://swapi.dev/api/species/25/\",\n            \"https://swapi.dev/api/species/26/\",\n            \"https://swapi.dev/api/species/27/\",\n            \"https://swapi.dev/api/species/28/\",\n            \"https://swapi.dev/api/species/29/\",\n            \"https://swapi.dev/api/species/30/\",\n            \"https://swapi.dev/api/species/33/\",\n            \"https://swapi.dev/api/species/34/\",\n            \"https://swapi.dev/api/species/35/\",\n            \"https://swapi.dev/api/species/36/\",\n            \"https://swapi.dev/api/species/37/\"\n        ],\n        \"created\": \"2014-12-20T18:49:38.403000Z\",\n        \"edited\": \"2014-12-20T20:47:52.073000Z\",\n        \"url\": \"https://swapi.dev/api/films/6/\"\n    }\n]"
+				},
+				{
+					"name": "Echec",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/categories/film",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"categories",
+								"film"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "96"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 25 Sep 2024 12:50:28 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"statusCode\": 500,\n    \"error\": \"Internal Server Error\",\n    \"message\": \"An internal server error occurred\"\n}"
+				},
+				{
+					"name": "Unauthorized",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/categories/species",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"categories",
+								"species"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "WWW-Authenticate",
+							"value": "Bearer error=\"Invalid token missing header\""
+						},
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "136"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 26 Sep 2024 19:39:57 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"statusCode\": 401,\n    \"error\": \"Unauthorized\",\n    \"message\": \"Invalid token missing header\",\n    \"attributes\": {\n        \"error\": \"Invalid token missing header\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "getOneFromACategory",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "sByJjCWEKXLXZSAlZYliKq9LGRO9A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/category/planets/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"category",
+						"planets",
+						"1"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Réussite",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/category/films/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"category",
+								"films",
+								"2"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin,accept-encoding"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 25 Sep 2024 09:27:20 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"title\": \"A New Hope\",\n    \"episode_id\": 4,\n    \"opening_crawl\": \"It is a period of civil war.\\r\\nRebel spaceships, striking\\r\\nfrom a hidden base, have won\\r\\ntheir first victory against\\r\\nthe evil Galactic Empire.\\r\\n\\r\\nDuring the battle, Rebel\\r\\nspies managed to steal secret\\r\\nplans to the Empire's\\r\\nultimate weapon, the DEATH\\r\\nSTAR, an armored space\\r\\nstation with enough power\\r\\nto destroy an entire planet.\\r\\n\\r\\nPursued by the Empire's\\r\\nsinister agents, Princess\\r\\nLeia races home aboard her\\r\\nstarship, custodian of the\\r\\nstolen plans that can save her\\r\\npeople and restore\\r\\nfreedom to the galaxy....\",\n    \"director\": \"George Lucas\",\n    \"producer\": \"Gary Kurtz, Rick McCallum\",\n    \"release_date\": \"1977-05-25\",\n    \"characters\": [\n        \"https://swapi.dev/api/people/1/\",\n        \"https://swapi.dev/api/people/2/\",\n        \"https://swapi.dev/api/people/3/\",\n        \"https://swapi.dev/api/people/4/\",\n        \"https://swapi.dev/api/people/5/\",\n        \"https://swapi.dev/api/people/6/\",\n        \"https://swapi.dev/api/people/7/\",\n        \"https://swapi.dev/api/people/8/\",\n        \"https://swapi.dev/api/people/9/\",\n        \"https://swapi.dev/api/people/10/\",\n        \"https://swapi.dev/api/people/12/\",\n        \"https://swapi.dev/api/people/13/\",\n        \"https://swapi.dev/api/people/14/\",\n        \"https://swapi.dev/api/people/15/\",\n        \"https://swapi.dev/api/people/16/\",\n        \"https://swapi.dev/api/people/18/\",\n        \"https://swapi.dev/api/people/19/\",\n        \"https://swapi.dev/api/people/81/\"\n    ],\n    \"planets\": [\n        \"https://swapi.dev/api/planets/1/\",\n        \"https://swapi.dev/api/planets/2/\",\n        \"https://swapi.dev/api/planets/3/\"\n    ],\n    \"starships\": [\n        \"https://swapi.dev/api/starships/2/\",\n        \"https://swapi.dev/api/starships/3/\",\n        \"https://swapi.dev/api/starships/5/\",\n        \"https://swapi.dev/api/starships/9/\",\n        \"https://swapi.dev/api/starships/10/\",\n        \"https://swapi.dev/api/starships/11/\",\n        \"https://swapi.dev/api/starships/12/\",\n        \"https://swapi.dev/api/starships/13/\"\n    ],\n    \"vehicles\": [\n        \"https://swapi.dev/api/vehicles/4/\",\n        \"https://swapi.dev/api/vehicles/6/\",\n        \"https://swapi.dev/api/vehicles/7/\",\n        \"https://swapi.dev/api/vehicles/8/\"\n    ],\n    \"species\": [\n        \"https://swapi.dev/api/species/1/\",\n        \"https://swapi.dev/api/species/2/\",\n        \"https://swapi.dev/api/species/3/\",\n        \"https://swapi.dev/api/species/4/\",\n        \"https://swapi.dev/api/species/5/\"\n    ],\n    \"created\": \"2014-12-10T14:23:31.880000Z\",\n    \"edited\": \"2014-12-20T19:49:45.256000Z\",\n    \"url\": \"https://swapi.dev/api/films/1/\"\n}"
+				},
+				{
+					"name": "Echec",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/category/films/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"category",
+								"films",
+								"7"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "96"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 25 Sep 2024 12:50:46 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"statusCode\": 500,\n    \"error\": \"Internal Server Error\",\n    \"message\": \"An internal server error occurred\"\n}"
+				},
+				{
+					"name": "Unauthorized",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/category/planets/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"category",
+								"planets",
+								"1"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "WWW-Authenticate",
+							"value": "Bearer error=\"Invalid token structure\""
+						},
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "126"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 26 Sep 2024 19:39:46 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"statusCode\": 401,\n    \"error\": \"Unauthorized\",\n    \"message\": \"Invalid token structure\",\n    \"attributes\": {\n        \"error\": \"Invalid token structure\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"Luke\",\r\n    \"password\": \"DadSuck\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Réussite",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"Luke\",\r\n    \"password\": \"DadSucks\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "141"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 26 Sep 2024 19:31:45 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikx1a2UiLCJpYXQiOjE3MjczNzkxMDV9.A9zaqImssDzxxAsByJjCWEKXLXZSAlZYliKq9LGRO9A\"\n}"
+				},
+				{
+					"name": "Unauthorized",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"Luke\",\r\n    \"password\": \"DadSuck\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "vary",
+							"value": "origin"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-length",
+							"value": "31"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 26 Sep 2024 21:10:01 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"error\": \"Invalid credentials\"\n}"
+				}
+			]
+		}
+	]
+}
