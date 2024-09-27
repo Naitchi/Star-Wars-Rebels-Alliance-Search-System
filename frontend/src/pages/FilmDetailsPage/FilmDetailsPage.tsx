@@ -39,6 +39,7 @@ type StateType = {
   selectedVehicles: Vehicle[];
 };
 
+// Composant affichant un élèment de la catégorie films en particulier
 export default function FilmDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ export default function FilmDetailsPage() {
   const starships: Starship[] = useSelector(getStarship);
   const vehicles: Vehicle[] = useSelector(getVehicles);
 
+  // Récupération de l'élèment
   useEffect(() => {
     const fetchItem = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -91,7 +93,8 @@ export default function FilmDetailsPage() {
       setState((prevState) => ({ ...prevState, selectedFilms: item }));
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     }
-  }, [dispatch, navigate, films, id]); // TODO voir si le endpoint remarche
+  }, [dispatch, navigate, films, id]);
+  // Récupération des planètes en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, planets: true }));
@@ -117,6 +120,7 @@ export default function FilmDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     }
   }, [dispatch, planets, state.selectedFilms]);
+  // Récupération des vehicules en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, vehicles: true }));
@@ -144,6 +148,7 @@ export default function FilmDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     }
   }, [dispatch, vehicles, state.selectedFilms]);
+  // Récupération des vaisseaux en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, starships: true }));
@@ -171,6 +176,7 @@ export default function FilmDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, starships: false }));
     }
   }, [dispatch, starships, state.selectedFilms]);
+  // Récupération des personnages en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -196,6 +202,7 @@ export default function FilmDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     }
   }, [dispatch, people, state.selectedFilms]);
+  // Récupération des espèces en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, species: true }));

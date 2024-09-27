@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
@@ -9,15 +9,16 @@ import TextInputField from '../../components/TextInputField/TextInputField';
 // Css
 import style from './SpeciesPage.module.css';
 
+// Store
 import { useDispatch, useSelector } from 'react-redux';
-
 import { getSpecies, setSpecies } from '../../store/speciesSlice';
 
+// Service
 import { getAll } from '../../services/data.service';
+
+// Types
 import { Species } from '../../types/types';
-
 type OrderBy = { field: 'name' | 'average_lifespan' | 'average_height' | null; order: boolean };
-
 type StateType = {
   orderBy: OrderBy;
   filter: {
@@ -32,11 +33,25 @@ type StateType = {
     language: string;
     homeworld: string;
   };
+  preDebounceFilter: {
+    name: string;
+    classification: string;
+    designation: string;
+    average_height: { average_height: string; operateur: string };
+    average_lifespan: { average_lifespan: string; operateur: string };
+    eye_colors: string;
+    hair_colors: string;
+    skin_colors: string;
+    language: string;
+    homeworld: string;
+  };
   filteredItems: Species[];
 };
 
+// Composant affichant une catégorie en particulier
 export default function SpeciesPage() {
   const dispatch = useDispatch();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
     orderBy: { field: null, order: true },
@@ -52,12 +67,66 @@ export default function SpeciesPage() {
       language: '',
       homeworld: '',
     },
+    preDebounceFilter: {
+      name: '',
+      classification: '',
+      designation: '',
+      average_height: { average_height: '', operateur: '<' },
+      average_lifespan: { average_lifespan: '', operateur: '<' },
+      eye_colors: '',
+      hair_colors: '',
+      skin_colors: '',
+      language: '',
+      homeworld: '',
+    },
     filteredItems: [],
   });
 
-  const handleTextChange = (champ: string, value: string) => {
-    setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
+  // Debounce pour les inputs text pour aléger l'application
+  const debouncedSetTextValue = useCallback((field: string, value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [field]: value } }));
+    }, 300);
+  }, []);
+  // Récupération des filtres texte
+  const handleTextChange = (field: string, value: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      preDebounceFilter: { ...prevState.preDebounceFilter, [field]: value },
+    }));
+    debouncedSetTextValue(field, value);
   };
+
+  // Debounce pour les inputs Date/Number pour aléger l'application
+  const debouncedSetOtherValue = useCallback(
+    (
+      field: 'average_height' | 'average_lifespan',
+      key: 'average_height' | 'average_lifespan' | 'operateur',
+      value: string,
+    ) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setState((prevState) => ({
+          ...prevState,
+          filter: {
+            ...prevState.filter,
+            [field]: {
+              ...prevState.filter[field],
+              [key]: value,
+            },
+          },
+        }));
+      }, 300);
+    },
+    [],
+  );
+
+  // Récupération des filtres Date/Number
   const handleOtherInputChange = (
     champ: 'average_height' | 'average_lifespan',
     key: 'average_height' | 'average_lifespan' | 'operateur',
@@ -65,15 +134,17 @@ export default function SpeciesPage() {
   ) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
+      preDebounceFilter: {
+        ...prevState.preDebounceFilter,
         [champ]: {
-          ...prevState.filter[champ],
+          ...prevState.preDebounceFilter[champ],
           [key]: value,
         },
       },
     }));
+    debouncedSetOtherValue(champ, key, value);
   };
+  // Récupération des filtres
   const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
       ...prevState,
@@ -83,6 +154,7 @@ export default function SpeciesPage() {
 
   const species: Species[] = useSelector(getSpecies);
 
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -98,7 +170,7 @@ export default function SpeciesPage() {
     if (!species.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, species]);
-
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (
       field:
@@ -199,7 +271,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Name"
           name="name"
-          value={state.filter.name}
+          value={state.preDebounceFilter.name}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'name')
@@ -213,7 +285,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Classification"
           name="classification"
-          value={state.filter.classification}
+          value={state.preDebounceFilter.classification}
           onChange={(e) => handleTextChange('classification', e.target.value)}
           onClear={() => handleTextChange('classification', '')}
           placeholder="Ex: mammal"
@@ -221,7 +293,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Designation"
           name="designation"
-          value={state.filter.designation}
+          value={state.preDebounceFilter.designation}
           onChange={(e) => handleTextChange('designation', e.target.value)}
           onClear={() => handleTextChange('designation', '')}
           placeholder="Ex: sentient"
@@ -229,7 +301,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Eye Colors"
           name="eye_colors"
-          value={state.filter.eye_colors}
+          value={state.preDebounceFilter.eye_colors}
           onChange={(e) => handleTextChange('eye_colors', e.target.value)}
           onClear={() => handleTextChange('eye_colors', '')}
           placeholder="Ex: blue"
@@ -237,7 +309,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Hair Colors"
           name="hair_colors"
-          value={state.filter.hair_colors}
+          value={state.preDebounceFilter.hair_colors}
           onChange={(e) => handleTextChange('hair_colors', e.target.value)}
           onClear={() => handleTextChange('hair_colors', '')}
           placeholder="Ex: brown"
@@ -245,7 +317,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Skin Colors"
           name="skin_colors"
-          value={state.filter.skin_colors}
+          value={state.preDebounceFilter.skin_colors}
           onChange={(e) => handleTextChange('skin_colors', e.target.value)}
           onClear={() => handleTextChange('skin_colors', '')}
           placeholder="Ex: white"
@@ -253,7 +325,7 @@ export default function SpeciesPage() {
         <TextInputField
           label="Language"
           name="language"
-          value={state.filter.language}
+          value={state.preDebounceFilter.language}
           onChange={(e) => handleTextChange('language', e.target.value)}
           onClear={() => handleTextChange('language', '')}
           placeholder="Ex: Galactic Basic"
@@ -262,7 +334,7 @@ export default function SpeciesPage() {
           label="Average Lifespan"
           name="average_lifespan"
           operateur={state.filter.average_lifespan.operateur}
-          value={state.filter.average_lifespan.average_lifespan}
+          value={state.preDebounceFilter.average_lifespan.average_lifespan}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -282,7 +354,7 @@ export default function SpeciesPage() {
           label="Average Height"
           name="average_height"
           operateur={state.filter.average_height.operateur}
-          value={state.filter.average_height.average_height}
+          value={state.preDebounceFilter.average_height.average_height}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 // Components
 import Header from '../../components/Header/Header';
@@ -9,13 +9,15 @@ import TextInputField from '../../components/TextInputField/TextInputField';
 // Css
 import style from './StarshipPage.module.css';
 
+// Store
 import { useDispatch, useSelector } from 'react-redux';
-
 import { getStarship, setStarship } from '../../store/starshipSlice';
 
+// Service
 import { getAll } from '../../services/data.service';
-import { Starship } from '../../types/types';
 
+// Types
+import { Starship } from '../../types/types';
 type OrderBy = {
   field:
     | 'name'
@@ -31,7 +33,6 @@ type OrderBy = {
     | null;
   order: boolean;
 };
-
 type StateType = {
   orderBy: OrderBy;
   filter: {
@@ -49,11 +50,28 @@ type StateType = {
     cargo_capacity: { cargo_capacity: string; operateur: string };
     consumables: { consumables: string; operateur: string };
   };
+  preDebounceFilter: {
+    name: string;
+    model: string;
+    starship_class: string;
+    manufacturer: string;
+    cost_in_credits: { cost_in_credits: string; operateur: string };
+    length: { length: string; operateur: string };
+    crew: string;
+    passengers: { passengers: string; operateur: string };
+    max_atmosphering_speed: { max_atmosphering_speed: string; operateur: string };
+    hyperdrive_rating: { hyperdrive_rating: string; operateur: string };
+    MGLT: { MGLT: string; operateur: string };
+    cargo_capacity: { cargo_capacity: string; operateur: string };
+    consumables: { consumables: string; operateur: string };
+  };
   filteredItems: Starship[];
 };
 
+// Composant affichant une catégorie en particulier
 export default function StarshipPage() {
   const dispatch = useDispatch();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
     orderBy: { field: null, order: true },
@@ -72,12 +90,63 @@ export default function StarshipPage() {
       cargo_capacity: { cargo_capacity: '', operateur: '<' },
       consumables: { consumables: '', operateur: '<' },
     },
+    preDebounceFilter: {
+      name: '',
+      model: '',
+      starship_class: '',
+      manufacturer: '',
+      cost_in_credits: { cost_in_credits: '', operateur: '<' },
+      length: { length: '', operateur: '<' },
+      crew: '',
+      passengers: { passengers: '', operateur: '<' },
+      max_atmosphering_speed: { max_atmosphering_speed: '', operateur: '<' },
+      hyperdrive_rating: { hyperdrive_rating: '', operateur: '<' },
+      MGLT: { MGLT: '', operateur: '<' },
+      cargo_capacity: { cargo_capacity: '', operateur: '<' },
+      consumables: { consumables: '', operateur: '<' },
+    },
     filteredItems: [],
   });
 
-  const handleTextChange = (champ: string, value: string) => {
-    setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
+  // Debounce pour les inputs text pour aléger l'application
+  const debouncedSetTextValue = useCallback((field: string, value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [field]: value } }));
+    }, 300);
+  }, []);
+  // Récupération des filtres texte
+  const handleTextChange = (field: string, value: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      preDebounceFilter: { ...prevState.preDebounceFilter, [field]: value },
+    }));
+    debouncedSetTextValue(field, value);
   };
+  // Debounce pour les inputs Date/Number pour aléger l'application
+  const debouncedSetOtherValue = useCallback(
+    (field: objet, key: objet | 'operateur', value: string) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setState((prevState) => ({
+          ...prevState,
+          filter: {
+            ...prevState.filter,
+            [field]: {
+              ...prevState.filter[field],
+              [key]: value,
+            },
+          },
+        }));
+      }, 300);
+    },
+    [],
+  );
+
   type objet =
     | 'cost_in_credits'
     | 'length'
@@ -88,26 +157,31 @@ export default function StarshipPage() {
     | 'cargo_capacity';
   type field = 'name' | 'model' | 'starship_class' | 'manufacturer';
 
+  // Récupération des filtres Date/Number
   const handleOtherInputChange = (champ: objet, key: objet | 'operateur', value: string) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
+      preDebounceFilter: {
+        ...prevState.preDebounceFilter,
         [champ]: {
-          ...prevState.filter[champ],
+          ...prevState.preDebounceFilter[champ],
           [key]: value,
         },
       },
     }));
+    debouncedSetOtherValue(champ, key, value);
   };
+  // Récupération des filtres
   const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
       ...prevState,
       orderBy: orderBy,
     }));
   };
+
   const starships: Starship[] = useSelector(getStarship);
 
+  // Récupération des Starship
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -124,7 +198,7 @@ export default function StarshipPage() {
     if (!starships.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, starships]);
-
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (field: field, array: Starship[]): Starship[] => {
       if (state.filter[field]) {
@@ -250,7 +324,7 @@ export default function StarshipPage() {
         <TextInputField
           label="Name"
           name="name"
-          value={state.filter.name}
+          value={state.preDebounceFilter.name}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'name')
@@ -264,7 +338,7 @@ export default function StarshipPage() {
         <TextInputField
           label="Model"
           name="model"
-          value={state.filter.model}
+          value={state.preDebounceFilter.model}
           onChange={(e) => handleTextChange('model', e.target.value)}
           onClear={() => handleTextChange('model', '')}
           placeholder="Ex: Star Courier"
@@ -272,7 +346,7 @@ export default function StarshipPage() {
         <TextInputField
           label="Starship Class"
           name="starship_class"
-          value={state.filter.starship_class}
+          value={state.preDebounceFilter.starship_class}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'starship_class')
@@ -286,7 +360,7 @@ export default function StarshipPage() {
         <TextInputField
           label="Manufacturer"
           name="manufacturer"
-          value={state.filter.manufacturer}
+          value={state.preDebounceFilter.manufacturer}
           onChange={(e) => handleTextChange('manufacturer', e.target.value)}
           onClear={() => handleTextChange('manufacturer', '')}
           placeholder="Ex: Republic Sienar Systems"
@@ -295,7 +369,7 @@ export default function StarshipPage() {
           label="Cost In Credits"
           name="cost_in_credits"
           operateur={state.filter.cost_in_credits.operateur}
-          value={state.filter.cost_in_credits.cost_in_credits}
+          value={state.preDebounceFilter.cost_in_credits.cost_in_credits}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -315,7 +389,7 @@ export default function StarshipPage() {
           label="Passengers"
           name="passengers"
           operateur={state.filter.passengers.operateur}
-          value={state.filter.passengers.passengers}
+          value={state.preDebounceFilter.passengers.passengers}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -333,7 +407,7 @@ export default function StarshipPage() {
           label="Length"
           name="length"
           operateur={state.filter.length.operateur}
-          value={state.filter.length.length}
+          value={state.preDebounceFilter.length.length}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -349,7 +423,7 @@ export default function StarshipPage() {
           label="Max Atmosphering Speed"
           name="max_atmosphering_speed"
           operateur={state.filter.max_atmosphering_speed.operateur}
-          value={state.filter.max_atmosphering_speed.max_atmosphering_speed}
+          value={state.preDebounceFilter.max_atmosphering_speed.max_atmosphering_speed}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -375,7 +449,7 @@ export default function StarshipPage() {
           label="Hyperdrive Rating"
           name="hyperdrive_rating"
           operateur={state.filter.hyperdrive_rating.operateur}
-          value={state.filter.hyperdrive_rating.hyperdrive_rating}
+          value={state.preDebounceFilter.hyperdrive_rating.hyperdrive_rating}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -395,7 +469,7 @@ export default function StarshipPage() {
           label="Megalight per hour"
           name="MGLT"
           operateur={state.filter.MGLT.operateur}
-          value={state.filter.MGLT.MGLT}
+          value={state.preDebounceFilter.MGLT.MGLT}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -411,7 +485,7 @@ export default function StarshipPage() {
           label="Cargo Capacity"
           name="cargo_capacity"
           operateur={state.filter.cargo_capacity.operateur}
-          value={state.filter.cargo_capacity.cargo_capacity}
+          value={state.preDebounceFilter.cargo_capacity.cargo_capacity}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {

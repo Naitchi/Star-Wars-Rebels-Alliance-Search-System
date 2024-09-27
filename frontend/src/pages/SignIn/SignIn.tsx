@@ -21,6 +21,7 @@ const SignIn: React.FC = () => {
     },
   });
 
+  // Fonction pour quand on clique sur connexion
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

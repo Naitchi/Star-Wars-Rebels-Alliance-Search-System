@@ -1,10 +1,11 @@
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import axios, { AxiosResponse } from 'axios';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
 
+// Fonction pour faire la requête pour le login
 export async function login(login: { username: string; password: string }) {
   const url: string = `http://localhost:3000/login`;
   try {
-    const response = await axios.post(url, login);
+    const response: AxiosResponse = await axios.post(url, login);
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
     }
@@ -14,12 +15,13 @@ export async function login(login: { username: string; password: string }) {
   }
 }
 
+// Fonction pour vérifier le temps du token
 const isTokenExpired = (token: string) => {
   if (!token) return true;
 
   try {
-    const decoded = jwtDecode(token);
-    const currentTime = Math.floor(Date.now() / 1000);
+    const decoded: JwtPayload = jwtDecode(token);
+    const currentTime: number = Math.floor(Date.now() / 1000);
 
     return decoded.exp !== undefined && decoded.exp < currentTime;
   } catch (error) {
@@ -28,6 +30,7 @@ const isTokenExpired = (token: string) => {
   }
 };
 
+// Fonction pour vérifier le token
 export const getToken = () => {
   const token: string | null = localStorage.getItem('token');
   if (token && isTokenExpired(token)) {

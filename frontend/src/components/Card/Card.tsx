@@ -8,8 +8,8 @@ export default function Card(
   }>,
 ) {
   const extractIdFromUrl = (url: string): string => {
-    const parts = url.split('/');
-    const length = parts.length;
+    const parts: string[] = url.split('/');
+    const length: number = parts.length;
     return `${parts[length - 3]}/${parts[length - 2]}`; // Récupère l'avant-dernier, le chiffre et la catégorie
   };
 

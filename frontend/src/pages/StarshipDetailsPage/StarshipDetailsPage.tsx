@@ -30,6 +30,7 @@ type StateType = {
   selectedStarships?: Starship;
 };
 
+// Composant affichant un élèment de la catégorie films en particulier
 export default function StarshipDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function StarshipDetailsPage() {
   const films: Films[] = useSelector(getFilms);
   const starships: Starship[] = useSelector(getStarship);
 
+  // Récupération de l'élèment
   useEffect(() => {
     const fetchItem = async () => {
       setIsLoading((prevState) => ({ ...prevState, starships: true }));
@@ -76,6 +78,7 @@ export default function StarshipDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, starships: false }));
     }
   }, [dispatch, navigate, starships, id]);
+  // Récupération des personnages en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -101,6 +104,7 @@ export default function StarshipDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     }
   }, [dispatch, people, state.selectedStarships]);
+  // Récupération des films en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));

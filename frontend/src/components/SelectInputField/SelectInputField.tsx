@@ -10,6 +10,8 @@ interface SelectInputFieldProps {
   onClear?: () => void;
 }
 
+// Composant réutilisable pour Input Select
+
 const SelectInputField: React.FC<SelectInputFieldProps> = ({
   label,
   name,

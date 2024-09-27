@@ -5,7 +5,7 @@ import CategoryCard from '../../components/CategoryCard/CategoryCard';
 // Css
 import style from './App.module.css';
 
-const categories = [
+const categories: { name: string; url: string; image: string }[] = [
   { name: 'Films', url: 'films', image: './img/affiche.jpg' },
   { name: 'Vehicles', url: 'vehicles', image: './img/vehicle.webp' },
   { name: 'Species', url: 'species', image: './img/species.webp' },
@@ -14,6 +14,7 @@ const categories = [
   { name: 'Starship', url: 'starship', image: './img/Starship.jpg' },
 ];
 
+// Affichage de toutes les différentes catégories
 function App() {
   return (
     <div className={style.app}>

@@ -17,6 +17,8 @@ interface OtherInputFieldProps {
   onClear: () => void;
 }
 
+// Composant réutilisable pour Input Date et Number
+
 const OtherInputField: React.FC<OtherInputFieldProps> = ({
   label,
   name,
@@ -57,7 +59,6 @@ const OtherInputField: React.FC<OtherInputFieldProps> = ({
           value={operateur}
           onChange={onOperateurChange}
           name="operateur"
-          id={name}
         >
           <option value="<">&lt;</option>
           <option value=">">&gt;</option>

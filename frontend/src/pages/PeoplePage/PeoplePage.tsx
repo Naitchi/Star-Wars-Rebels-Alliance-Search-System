@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Components
 import Card from '../../components/Card/Card';
@@ -10,14 +10,16 @@ import TextInputField from '../../components/TextInputField/TextInputField';
 // Css
 import style from './PeoplePage.module.css';
 
+// Store
+import { getPeople, setPeople } from '../../store/peopleSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
+// Service
 import { getAll } from '../../services/data.service';
-import { getPeople, setPeople } from '../../store/peopleSlice';
+
+// Types
 import { People } from '../../types/types';
-
 type OrderBy = { field: 'name' | 'birth_year' | 'height' | 'mass' | null; order: boolean };
-
 type StateType = {
   orderBy: OrderBy;
   filter: {
@@ -31,11 +33,24 @@ type StateType = {
     skin_color: string;
     homeworld: string;
   };
+  preDebounceFilter: {
+    name: string;
+    birth_year: { birth_year: string; operateur: string };
+    eye_color: string;
+    gender: string;
+    hair_color: string;
+    height: { height?: number; operateur: string };
+    mass: { mass?: number; operateur: string };
+    skin_color: string;
+    homeworld: string;
+  };
   filteredItems: People[];
 };
 
+// Composant affichant une catégorie en particulier
 export default function PeoplePage() {
   const dispatch = useDispatch();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
     orderBy: { field: null, order: true },
@@ -50,12 +65,66 @@ export default function PeoplePage() {
       skin_color: '',
       homeworld: '',
     },
+    preDebounceFilter: {
+      name: '',
+      birth_year: { birth_year: '', operateur: '<' },
+      eye_color: '',
+      gender: '',
+      hair_color: '',
+      height: { height: undefined, operateur: '<' },
+      mass: { mass: undefined, operateur: '<' },
+      skin_color: '',
+      homeworld: '',
+    },
     filteredItems: [],
   });
 
-  const handleTextChange = (champ: string, value: string) => {
-    setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
+  // Debounce pour les inputs text pour aléger l'application
+  const debouncedSetTextValue = useCallback((field: string, value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [field]: value } }));
+    }, 300);
+  }, []);
+
+  // Récupération des filtres texte
+  const handleTextChange = (field: string, value: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      preDebounceFilter: { ...prevState.preDebounceFilter, [field]: value },
+    }));
+    debouncedSetTextValue(field, value);
   };
+
+  // Debounce pour les inputs Date/Number pour aléger l'application
+  const debouncedSetOtherValue = useCallback(
+    (
+      field: 'birth_year' | 'height' | 'mass',
+      key: 'birth_year' | 'height' | 'mass' | 'operateur',
+      value: string,
+    ) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setState((prevState) => ({
+          ...prevState,
+          filter: {
+            ...prevState.filter,
+            [field]: {
+              ...prevState.filter[field],
+              [key]: value,
+            },
+          },
+        }));
+      }, 300);
+    },
+    [],
+  );
+
+  // Récupération des filtres
   const handleOtherInputChange = (
     champ: 'birth_year' | 'height' | 'mass',
     key: 'birth_year' | 'height' | 'mass' | 'operateur',
@@ -63,14 +132,15 @@ export default function PeoplePage() {
   ) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
+      preDebounceFilter: {
+        ...prevState.preDebounceFilter,
         [champ]: {
-          ...prevState.filter[champ],
+          ...prevState.preDebounceFilter[champ],
           [key]: value,
         },
       },
     }));
+    debouncedSetOtherValue(champ, key, value);
   };
   const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
@@ -81,6 +151,7 @@ export default function PeoplePage() {
 
   const people: People[] = useSelector(getPeople);
 
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -97,6 +168,7 @@ export default function PeoplePage() {
     else setIsLoading(false);
   }, [dispatch, people]);
 
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (
       field: 'name' | 'eye_color' | 'gender' | 'hair_color' | 'skin_color' | 'homeworld',
@@ -117,9 +189,9 @@ export default function PeoplePage() {
       if (!value) {
         return array;
       }
-      const numberValue = new Date(value).getTime();
+      const numberValue: number = new Date(value).getTime();
       return array.filter((item) => {
-        const itemValue = new Date(item[field]).getTime();
+        const itemValue: number = new Date(item[field]).getTime();
         switch (operateur) {
           case '<':
             return itemValue < numberValue;
@@ -223,7 +295,7 @@ export default function PeoplePage() {
         <TextInputField
           label="Name"
           name="name"
-          value={state.filter.name}
+          value={state.preDebounceFilter.name}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'name')
@@ -237,7 +309,7 @@ export default function PeoplePage() {
         <TextInputField
           label="Eye Color"
           name="eye_color"
-          value={state.filter.eye_color}
+          value={state.preDebounceFilter.eye_color}
           onChange={(e) => handleTextChange('eye_color', e.target.value)}
           onClear={() => handleTextChange('eye_color', '')}
           placeholder="Ex: blue"
@@ -245,7 +317,7 @@ export default function PeoplePage() {
         <TextInputField
           label="Hair Color"
           name="hair_color"
-          value={state.filter.hair_color}
+          value={state.preDebounceFilter.hair_color}
           onChange={(e) => handleTextChange('hair_color', e.target.value)}
           onClear={() => handleTextChange('hair_color', '')}
           placeholder="Ex: brown"
@@ -254,7 +326,7 @@ export default function PeoplePage() {
           label="Gender"
           name="gender"
           options={['n/a', 'female', 'male']}
-          value={state.filter.gender}
+          value={state.preDebounceFilter.gender}
           onChange={(e) => handleTextChange('gender', e.target.value)}
           onClear={() => handleTextChange('gender', '')}
         />
@@ -262,7 +334,7 @@ export default function PeoplePage() {
           label="Mass"
           name="mass"
           operateur={state.filter.mass.operateur}
-          value={state.filter.mass.mass}
+          value={state.preDebounceFilter.mass.mass}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'mass')
@@ -278,7 +350,7 @@ export default function PeoplePage() {
           label="height"
           name="height"
           operateur={state.filter.height.operateur}
-          value={state.filter.height.height}
+          value={state.preDebounceFilter.height.height}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'height')
@@ -293,10 +365,10 @@ export default function PeoplePage() {
         <TextInputField
           label="Skin Color"
           name="skin_color"
-          value={state.filter.skin_color}
+          value={state.preDebounceFilter.skin_color}
           onChange={(e) => handleTextChange('skin_color', e.target.value)}
           onClear={() => handleTextChange('skin_color', '')}
-          placeholder="Ex: beige"
+          placeholder="Ex: fair"
         />
       </div>
       <div className={style.container}>

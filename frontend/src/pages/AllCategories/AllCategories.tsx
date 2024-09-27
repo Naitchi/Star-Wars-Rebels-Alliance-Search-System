@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 // Components
 import Card from '../../components/Card/Card';
@@ -22,15 +22,24 @@ import { getAll } from '../../services/data.service';
 //Types
 import { All, Films, People, Planet, Species, Starship, Vehicle } from '../../types/types';
 
-type StateType = { items: All[]; filteredItems: All[]; search: string; orderBy: 1 | 2 | 3 };
+type StateType = {
+  items: All[];
+  filteredItems: All[];
+  search: string;
+  preDebounceSearch: string;
+  orderBy: 1 | 2 | 3;
+};
 
+// Composant affichant tout les élèments de toutes les catégories de SWAPI
 export default function AllCategories() {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [state, setState] = useState<StateType>({
     items: [],
     filteredItems: [],
     search: '',
+    preDebounceSearch: '',
     orderBy: 1,
   });
 
@@ -41,12 +50,14 @@ export default function AllCategories() {
   const people: People[] = useSelector(getPeople);
   const species: Species[] = useSelector(getSpecies);
 
+  // Mise en State de tout les élèments
   useEffect(() => {
     setState((prevState) => ({
       ...prevState,
       items: [...planets, ...vehicle, ...starship, ...films, ...people, ...species],
     }));
   }, [dispatch, vehicle, starship, planets, films, people, species]);
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -61,6 +72,7 @@ export default function AllCategories() {
     if (!films.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, films]);
+  // Récupération des planetes
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -75,6 +87,7 @@ export default function AllCategories() {
     if (!planets.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, planets]);
+  // Récupération des vehicules
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -89,6 +102,7 @@ export default function AllCategories() {
     if (!vehicle.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, vehicle]);
+  // Récupération des vaisseaux
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -103,6 +117,7 @@ export default function AllCategories() {
     if (!starship.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, starship]);
+  // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -118,6 +133,7 @@ export default function AllCategories() {
     if (!people.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, people]);
+  // Récupération des espèces
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -132,9 +148,10 @@ export default function AllCategories() {
     if (!species.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, species]);
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (array: All[]): All[] => {
-      const search = state.search;
+      const search: string = state.search;
       if (search) {
         const regex = new RegExp(search, 'i');
         return array.filter((item) => {
@@ -173,11 +190,26 @@ export default function AllCategories() {
     if (state.items.length) Filter(state.items);
   }, [state.orderBy, state.search, state.items]);
 
+  // Debounce pour aléger l'application
+  const debouncedSearchValue = useCallback((value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({
+        ...prevState,
+        search: value,
+      }));
+    }, 300);
+  }, []);
+
+  // Récupération des filtres
   const handleSearchChange = (value: string) => {
     setState((prevState) => ({
       ...prevState,
-      search: value,
+      preDebounceSearch: value,
     }));
+    debouncedSearchValue(value);
   };
   const toggleOrder = () => {
     setState((prevState) => ({
@@ -203,7 +235,7 @@ export default function AllCategories() {
                 id="Search"
                 className={style.searchInput}
                 placeholder="Look for something in particular"
-                value={state.search}
+                value={state.preDebounceSearch}
                 onChange={(e) => handleSearchChange(e.target.value)}
               />
               <button className={style.clearButton} onClick={() => handleSearchChange('')}>

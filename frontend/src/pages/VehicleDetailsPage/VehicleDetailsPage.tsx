@@ -30,6 +30,7 @@ type StateType = {
   selectedVehicles?: Vehicle;
 };
 
+// Composant affichant un élèment de la catégorie films en particulier
 export default function VehicleDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function VehicleDetailsPage() {
   const films: Films[] = useSelector(getFilms);
   const vehicles: Vehicle[] = useSelector(getVehicles);
 
+  // Récupération de l'élèment
   useEffect(() => {
     const fetchItem = async () => {
       setIsLoading((prevState) => ({ ...prevState, vehicles: true }));
@@ -75,6 +77,7 @@ export default function VehicleDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     }
   }, [dispatch, navigate, vehicles, id]);
+  // Récupération des personnages en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -100,6 +103,7 @@ export default function VehicleDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     }
   }, [dispatch, people, state.selectedVehicles]);
+  // Récupération des films en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));

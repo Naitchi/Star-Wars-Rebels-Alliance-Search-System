@@ -1,23 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Components
-import Header from '../../components/Header/Header';
 import Card from '../../components/Card/Card';
+import Header from '../../components/Header/Header';
 import OtherInputField from '../../components/OtherInputField/OtherInputField';
 import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
 import style from './PlanetsPage.module.css';
 
+// Store
 import { useDispatch, useSelector } from 'react-redux';
-
 import { getPlanets, setPlanets } from '../../store/planetsSlice';
 
+// Service
 import { getAll } from '../../services/data.service';
+
+// Types
 import { Planet } from '../../types/types';
-
 type OrderBy = { field: 'name' | 'diameter' | 'gravity' | 'population' | null; order: boolean };
-
 type StateType = {
   orderBy: OrderBy;
   filter: {
@@ -28,12 +29,22 @@ type StateType = {
     climate: string;
     terrain: string;
   };
+  preDebounceFilter: {
+    name: string;
+    diameter: { diameter?: number; operateur: string };
+    gravity: { gravity?: number; operateur: string };
+    population: { population?: number; operateur: string };
+    climate: string;
+    terrain: string;
+  };
   filteredItems: Planet[];
 };
 
+// Composant affichant une catégorie en particulier
 export default function PlanetsPage() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [state, setState] = useState<StateType>({
     orderBy: { field: null, order: true },
     filter: {
@@ -44,12 +55,62 @@ export default function PlanetsPage() {
       climate: '',
       terrain: '',
     },
+    preDebounceFilter: {
+      name: '',
+      diameter: { diameter: undefined, operateur: '<' },
+      gravity: { gravity: undefined, operateur: '<' },
+      population: { population: undefined, operateur: '<' },
+      climate: '',
+      terrain: '',
+    },
     filteredItems: [],
   });
 
-  const handleTextChange = (champ: string, value: string) => {
-    setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
+  // Debounce pour les inputs text pour aléger l'application
+  const debouncedSetTextValue = useCallback((field: string, value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [field]: value } }));
+    }, 300);
+  }, []);
+  // Récupération des filtres texte
+  const handleTextChange = (field: string, value: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      preDebounceFilter: { ...prevState.preDebounceFilter, [field]: value },
+    }));
+    debouncedSetTextValue(field, value);
   };
+
+  // Debounce pour les inputs Date/Number pour aléger l'application
+  const debouncedSetOtherValue = useCallback(
+    (
+      field: 'population' | 'gravity' | 'diameter',
+      key: 'population' | 'gravity' | 'diameter' | 'operateur',
+      value: string,
+    ) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setState((prevState) => ({
+          ...prevState,
+          filter: {
+            ...prevState.filter,
+            [field]: {
+              ...prevState.filter[field],
+              [key]: value,
+            },
+          },
+        }));
+      }, 300);
+    },
+    [],
+  );
+
+  // Récupération des filtres Date/Number
   const handleOtherInputChange = (
     champ: 'population' | 'gravity' | 'diameter',
     key: 'population' | 'gravity' | 'diameter' | 'operateur',
@@ -57,15 +118,17 @@ export default function PlanetsPage() {
   ) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
+      preDebounceFilter: {
+        ...prevState.preDebounceFilter,
         [champ]: {
-          ...prevState.filter[champ],
+          ...prevState.preDebounceFilter[champ],
           [key]: value,
         },
       },
     }));
+    debouncedSetOtherValue(champ, key, value);
   };
+  // Récupération des filtres
   const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
       ...prevState,
@@ -75,6 +138,7 @@ export default function PlanetsPage() {
 
   const planets: Planet[] = useSelector(getPlanets);
 
+  // Récupération des planetes
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -91,6 +155,7 @@ export default function PlanetsPage() {
     else setIsLoading(false);
   }, [dispatch, planets]);
 
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (field: 'terrain' | 'climate' | 'name', array: Planet[]): Planet[] => {
       if (state.filter[field]) {
@@ -181,7 +246,7 @@ export default function PlanetsPage() {
         <TextInputField
           label="Name"
           name="name"
-          value={state.filter.name}
+          value={state.preDebounceFilter.name}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'name')
@@ -190,13 +255,13 @@ export default function PlanetsPage() {
           }}
           onChange={(e) => handleTextChange('name', e.target.value)}
           onClear={() => handleTextChange('name', '')}
-          placeholder="Ex: Tatouine"
+          placeholder="Ex: Tato"
         />
         <OtherInputField
           label="Population"
           name="population"
           operateur={state.filter.population.operateur}
-          value={state.filter.population.population}
+          value={state.preDebounceFilter.population.population}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -213,24 +278,24 @@ export default function PlanetsPage() {
         <TextInputField
           label="Climate"
           name="climate"
-          value={state.filter.climate}
+          value={state.preDebounceFilter.climate}
           onChange={(e) => handleTextChange('climate', e.target.value)}
           onClear={() => handleTextChange('climate', '')}
-          placeholder="Ex: rainy"
+          placeholder="Ex: temperate"
         />
         <TextInputField
           label="Terrain"
           name="terrain"
-          value={state.filter.terrain}
+          value={state.preDebounceFilter.terrain}
           onChange={(e) => handleTextChange('terrain', e.target.value)}
           onClear={() => handleTextChange('terrain', '')}
-          placeholder="Ex: mud"
+          placeholder="Ex: verdant"
         />
         <OtherInputField
           label="Diameter"
           name="diameter"
           operateur={state.filter.diameter.operateur}
-          value={state.filter.diameter.diameter}
+          value={state.preDebounceFilter.diameter.diameter}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -246,7 +311,7 @@ export default function PlanetsPage() {
           label="Gravity"
           name="gravity"
           operateur={state.filter.gravity.operateur}
-          value={state.filter.gravity.gravity}
+          value={state.preDebounceFilter.gravity.gravity}
           type="number"
           orderBy={state.orderBy}
           onOrderChange={() => {

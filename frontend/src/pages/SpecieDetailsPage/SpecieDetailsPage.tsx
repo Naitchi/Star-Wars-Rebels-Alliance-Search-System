@@ -33,6 +33,7 @@ type StateType = {
   selectedSpecies?: Species;
 };
 
+// Composant affichant un élèment de la catégorie Species en particulier
 export default function SpeciesDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ export default function SpeciesDetailsPage() {
   const planets: Planet[] = useSelector(getPlanets);
   const species: Species[] = useSelector(getSpecies);
 
+  // Récupération de l'élèment
   useEffect(() => {
     const fetchItem = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -82,6 +84,8 @@ export default function SpeciesDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, species: false }));
     }
   }, [dispatch, navigate, species, id]);
+
+  // Récupération des planètes en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, planets: true }));
@@ -107,6 +111,7 @@ export default function SpeciesDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     }
   }, [dispatch, planets, state.selectedSpecies]);
+  // Récupération des films en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -132,6 +137,7 @@ export default function SpeciesDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     }
   }, [dispatch, films, state.selectedSpecies]);
+  // Récupération des personnages en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));

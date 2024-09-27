@@ -30,6 +30,7 @@ type StateType = {
   selectedPlanets?: Planet;
 };
 
+// Composant affichant un élèment de la catégorie films en particulier
 export default function PlanetDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function PlanetDetailsPage() {
   const films: Films[] = useSelector(getFilms);
   const planets: Planet[] = useSelector(getPlanets);
 
+  // Récupération de l'élèment
   useEffect(() => {
     const fetchItem = async () => {
       setIsLoading((prevState) => ({ ...prevState, planets: true }));
@@ -76,6 +78,7 @@ export default function PlanetDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     }
   }, [dispatch, navigate, planets, id]);
+  // Récupération des films en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -103,6 +106,7 @@ export default function PlanetDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     }
   }, [dispatch, films, state.selectedPlanets]);
+  // Récupération des personnages en rapport à l'élèment
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));

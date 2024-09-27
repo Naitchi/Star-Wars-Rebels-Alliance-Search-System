@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 // Pages
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import AllCategories from './pages/AllCategories/AllCategories';
 import App from './pages/App/App';
 import FilmDetailsPage from './pages/FilmDetailsPage/FilmDetailsPage';
 import FilmsPage from './pages/FilmsPage/FilmsPage';
@@ -11,21 +13,19 @@ import PeopleDetailsPage from './pages/PeopleDetailsPage/PeopleDetailsPage';
 import PeoplePage from './pages/PeoplePage/PeoplePage';
 import PlanetDetailsPage from './pages/PlanetDetailsPage/PlanetDetailsPage';
 import PlanetsPage from './pages/PlanetsPage/PlanetsPage';
+import SignIn from './pages/SignIn/SignIn';
 import SpecieDetailsPage from './pages/SpecieDetailsPage/SpecieDetailsPage';
 import SpeciesPage from './pages/SpeciesPage/SpeciesPage';
 import StarshipDetailsPage from './pages/StarshipDetailsPage/StarshipDetailsPage';
 import StarshipPage from './pages/StarshipPage/StarshipPage';
 import VehicleDetailsPage from './pages/VehicleDetailsPage/VehicleDetailsPage';
 import VehiclesPage from './pages/VehiclesPage/VehiclesPage';
-import SignIn from './pages/SignIn/SignIn';
 
 // CSS
 import './assets/css/index.css';
 
 import { Provider } from 'react-redux';
 import store from './store/index';
-import AllCategories from './pages/AllCategories/AllCategories';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 // Configuration des routes avec React Router
 const router = createBrowserRouter([

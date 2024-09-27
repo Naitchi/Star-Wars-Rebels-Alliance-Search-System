@@ -1,23 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Components
-import Header from '../../components/Header/Header';
 import Card from '../../components/Card/Card';
+import Header from '../../components/Header/Header';
 import OtherInputField from '../../components/OtherInputField/OtherInputField';
 import TextInputField from '../../components/TextInputField/TextInputField';
 
 // Css
 import style from './FilmsPage.module.css';
 
+// Store
 import { useDispatch, useSelector } from 'react-redux';
-
 import { getFilms, setFilms } from '../../store/filmsSlice';
 
+// Service
 import { getAll } from '../../services/data.service';
+
+// Types
 import { Films } from '../../types/types';
-
 type OrderBy = { field: 'title' | 'episode_id' | 'release_date' | null; order: boolean };
-
 type StateType = {
   orderBy: OrderBy;
   filter: {
@@ -27,11 +28,20 @@ type StateType = {
     producer: string;
     release_date: { release_date?: string; operateur: string };
   };
+  preDebounceFilter: {
+    title: string;
+    episode_id: { episode_id?: number; operateur: string };
+    director: string;
+    producer: string;
+    release_date: { release_date?: string; operateur: string };
+  };
   filteredItems: Films[];
 };
 
+// Composant affichant une catégorie en particulier
 export default function FilmsPage() {
   const dispatch = useDispatch();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<StateType>({
     orderBy: { field: null, order: true },
@@ -42,12 +52,62 @@ export default function FilmsPage() {
       producer: '',
       release_date: { release_date: undefined, operateur: '<' },
     },
+    preDebounceFilter: {
+      title: '',
+      episode_id: { episode_id: undefined, operateur: '<' },
+      director: '',
+      producer: '',
+      release_date: { release_date: undefined, operateur: '<' },
+    },
     filteredItems: [],
   });
 
-  const handleTextChange = (champ: string, value: string) => {
-    setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [champ]: value } }));
+  // Debounce pour les inputs text pour aléger l'application
+  const debouncedSetTextValue = useCallback((field: string, value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setState((prevState) => ({ ...prevState, filter: { ...prevState.filter, [field]: value } }));
+    }, 300);
+  }, []);
+
+  // Récupération des filtres texte
+  const handleTextChange = (field: string, value: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      preDebounceFilter: { ...prevState.preDebounceFilter, [field]: value },
+    }));
+    debouncedSetTextValue(field, value);
   };
+
+  // Debounce pour les inputs Date/Number pour aléger l'application
+  const debouncedSetOtherValue = useCallback(
+    (
+      field: 'release_date' | 'episode_id',
+      key: 'release_date' | 'episode_id' | 'operateur',
+      value: string,
+    ) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setState((prevState) => ({
+          ...prevState,
+          filter: {
+            ...prevState.filter,
+            [field]: {
+              ...prevState.filter[field],
+              [key]: value,
+            },
+          },
+        }));
+      }, 300);
+    },
+    [],
+  );
+
+  // Récupération des filtres Date/Number
   const handleOtherInputChange = (
     champ: 'release_date' | 'episode_id',
     key: 'release_date' | 'episode_id' | 'operateur',
@@ -55,15 +115,18 @@ export default function FilmsPage() {
   ) => {
     setState((prevState) => ({
       ...prevState,
-      filter: {
-        ...prevState.filter,
+      preDebounceFilter: {
+        ...prevState.preDebounceFilter,
         [champ]: {
-          ...prevState.filter[champ],
+          ...prevState.preDebounceFilter[champ],
           [key]: value,
         },
       },
     }));
+    debouncedSetOtherValue(champ, key, value);
   };
+
+  // Récupération des filtres
   const handleOrderChange = (orderBy: OrderBy) => {
     setState((prevState) => ({
       ...prevState,
@@ -73,6 +136,7 @@ export default function FilmsPage() {
 
   const films: Films[] = useSelector(getFilms);
 
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
@@ -88,7 +152,7 @@ export default function FilmsPage() {
     if (!films.length) fetchItems();
     else setIsLoading(false);
   }, [dispatch, films]);
-
+  // Filtrages des élèments selon les filtres selectionnés
   useEffect(() => {
     const filterTextField = (field: 'title' | 'director' | 'producer', array: Films[]): Films[] => {
       if (state.filter[field]) {
@@ -106,9 +170,9 @@ export default function FilmsPage() {
       if (!value) {
         return array;
       }
-      const numberValue = new Date(value).getTime();
+      const numberValue: number = new Date(value).getTime();
       return array.filter((item) => {
-        const itemValue = new Date(item[field]).getTime();
+        const itemValue: number = new Date(item[field]).getTime();
         switch (operateur) {
           case '<':
             return itemValue < numberValue;
@@ -134,9 +198,9 @@ export default function FilmsPage() {
       if (!value) {
         return array;
       }
-      const numberValue = Number(value);
+      const numberValue: number = Number(value);
       return array.filter((item) => {
-        const itemValue = Number(item[field]);
+        const itemValue: number = Number(item[field]);
         switch (operateur) {
           case '<':
             return itemValue < numberValue;
@@ -200,7 +264,7 @@ export default function FilmsPage() {
         <TextInputField
           label="Title"
           name="title"
-          value={state.filter.title}
+          value={state.preDebounceFilter.title}
           orderBy={state.orderBy}
           onOrderChange={() => {
             if (state.orderBy.field === 'title')
@@ -215,7 +279,7 @@ export default function FilmsPage() {
           label="Episode"
           name="episode_id"
           operateur={state.filter.episode_id.operateur}
-          value={state.filter.episode_id.episode_id}
+          value={state.preDebounceFilter.episode_id.episode_id}
           type="number"
           max={6}
           orderBy={state.orderBy}
@@ -234,7 +298,7 @@ export default function FilmsPage() {
           label="Release Date"
           name="release_date"
           operateur={state.filter.release_date.operateur}
-          value={state.filter.release_date.release_date}
+          value={state.preDebounceFilter.release_date.release_date}
           type="date"
           orderBy={state.orderBy}
           onOrderChange={() => {
@@ -253,7 +317,7 @@ export default function FilmsPage() {
         <TextInputField
           label="Director"
           name="director"
-          value={state.filter.director}
+          value={state.preDebounceFilter.director}
           onChange={(e) => handleTextChange('director', e.target.value)}
           onClear={() => handleTextChange('director', '')}
           placeholder="Ex: George"
@@ -261,7 +325,7 @@ export default function FilmsPage() {
         <TextInputField
           label="Producer"
           name="producer"
-          value={state.filter.producer}
+          value={state.preDebounceFilter.producer}
           onChange={(e) => handleTextChange('producer', e.target.value)}
           onClear={() => handleTextChange('producer', '')}
           placeholder="Ex: Lucas"

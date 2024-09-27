@@ -14,6 +14,8 @@ type DisplayerProps = {
   selected: Items;
 };
 
+// Refactorisation d'un élément pour évité d'avoir trop de logic dans le code
+
 const Displayer: React.FC<DisplayerProps> = ({ label, isLoading, selected }) => {
   const renderContent = () => {
     if (isLoading) {

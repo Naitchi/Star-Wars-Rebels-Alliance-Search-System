@@ -1,50 +1,57 @@
-# React + TypeScript + Vite
+# Rebels Alliance Search System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This application provides an interface to the SWAPI (Star Wars API) for the Rebels ([an exercise](https://github.com/KrashStudio/react-exercice)). It was developed in 4 days.
 
-Currently, two official plugins are available:
+## Functionality
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Authentication**: You need to register in order to access the site and its data.
+- **Filters**: You can filter a lot of data using various filters.
+- **Close-Up Look**: From the whole category to a single element, you can explore a lot of data.
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. Clone the repository:
 
-- Configure the top-level `parserOptions` property like this:
+   ```bash
+   git clone <URL_REPO>
+   ```
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+2. Install dependencies & launch the front-end:
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+3. Install dependencies & launch the back-end:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+
+4. Access the application in your browser:
+
+   [http://localhost:5173](http://localhost:5173)
+   (If this doesn't work, look for the URL in your front-end cmd)
+
+## Technologies Used
+
+- **[Vite](https://vitejs.dev/)**: A fast and modern build tool that provides an optimized development experience for JavaScript frameworks, with features like hot module replacement and pre-bundling.
+- **[Axios](https://axios-http.com/docs/intro)**: Promise-based HTTP client for the browser and Node.js.
+- **[Hapi](https://hapi.dev/api)**: JavaScript server-side framework.
+- **[JWT](https://jwt.io/introduction/)**: JSON Web Token for securely transmitting information.
+- **[React](https://reactjs.org/docs/getting-started.html)**: Library for building user interfaces.
+- **[Redux](https://redux.js.org/introduction/getting-started)**: Predictable state container for React apps.
+- **[bcryptjs](https://github.com/dcodeIO/bcrypt.js)**: Library for hashing passwords.
+- **[TypeScript](https://www.typescriptlang.org/docs/)**: Superset of JavaScript that compiles to plain JavaScript.
+
+## Contributing
+
+Contributions are welcome! For improvement suggestions, please open an issue to discuss the proposed changes. For direct contributions, please open a pull request with your modifications.
+
+## License
+
+This project is licensed under the MIT License.
