@@ -19,6 +19,7 @@ const generateToken = (username: string): string => {
 };
 
 const authRoutes: Hapi.ServerRoute[] = [
+  // Route pour login et renvoyer un token
   {
     method: 'POST',
     path: '/login',

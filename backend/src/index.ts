@@ -2,7 +2,7 @@ import Hapi from '@hapi/hapi';
 import jwt from '@hapi/jwt';
 
 // Middleware
-import { jwtAuthStrategy } from './auth.middleware';
+import { jwtAuthStrategy } from './middlewares/auth.middleware';
 
 // Routes
 import authRoutes from './routes/authRoutes';

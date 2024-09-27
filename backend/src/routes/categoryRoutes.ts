@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { Item, Items } from '../types/types';
 
 const categoryRoutes: Hapi.ServerRoute[] = [
+  // route pour savoir si le serveur marche bien
   {
     method: 'GET',
     path: '/status',
@@ -10,6 +11,7 @@ const categoryRoutes: Hapi.ServerRoute[] = [
       return { status: 'OK', message: 'Le serveur fonctionne correctement!' };
     },
   },
+  // route pour récupérer un élément spécifique d'une catégorie spécifique dans SWAPI
   {
     method: 'GET',
     path: '/category/{name}/{id}',
@@ -31,6 +33,7 @@ const categoryRoutes: Hapi.ServerRoute[] = [
       }
     },
   },
+  // route pour récupérer une catégorie spécifique dans SWAPI
   {
     method: 'GET',
     path: '/categories/{name}',

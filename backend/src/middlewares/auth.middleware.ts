@@ -2,6 +2,7 @@ import { Request, ResponseToolkit } from '@hapi/hapi';
 
 const JWT_SECRET: string = 'mySuperSecretKey123!'; // TODO mettre dans un .env sinon l'empire va s'en emparer 🤭
 
+// middleware d'authentifiction
 export const jwtAuthStrategy = {
   keys: JWT_SECRET,
   verify: {
