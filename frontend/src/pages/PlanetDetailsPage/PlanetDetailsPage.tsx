@@ -78,7 +78,7 @@ export default function PlanetDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     }
   }, [dispatch, navigate, planets, id]);
-  // Récupération des films en rapport à l'élèment
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -90,23 +90,9 @@ export default function PlanetDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
-    const selector = () => {
-      if (state.selectedPlanets) {
-        const selectedElements: Films[] = [];
-        state.selectedPlanets.films.forEach((url) => {
-          const matchedElements = films.filter((item) => item.url === url);
-          selectedElements.push(...matchedElements);
-        });
-        setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
-      }
-    };
     if (!films.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
-    }
-  }, [dispatch, films, state.selectedPlanets]);
-  // Récupération des personnages en rapport à l'élèment
+  }, [dispatch, films]);
+  // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -118,7 +104,22 @@ export default function PlanetDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
-    const selector = () => {
+    if (!people.length) fetchItems();
+  }, [dispatch, people]);
+
+  // Logique de tri
+  useEffect(() => {
+    const selectFilms = () => {
+      if (state.selectedPlanets) {
+        const selectedElements: Films[] = [];
+        state.selectedPlanets.films.forEach((url) => {
+          const matchedElements = films.filter((item) => item.url === url);
+          selectedElements.push(...matchedElements);
+        });
+        setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+      }
+    };
+    const selectPeople = () => {
       const selectedElements: People[] = [];
       state.selectedPlanets?.residents.forEach((url) => {
         const matchedElements = people.filter((item) => item.url === url);
@@ -126,12 +127,10 @@ export default function PlanetDetailsPage() {
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
     };
-    if (!people.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
-    }
-  }, [dispatch, people, state.selectedPlanets]);
+
+    selectFilms();
+    selectPeople();
+  }, [planets, people, state.selectedPlanets, films]);
 
   return (
     <div className={style.app}>

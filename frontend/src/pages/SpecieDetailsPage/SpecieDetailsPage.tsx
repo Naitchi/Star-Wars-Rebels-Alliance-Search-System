@@ -85,7 +85,7 @@ export default function SpeciesDetailsPage() {
     }
   }, [dispatch, navigate, species, id]);
 
-  // Récupération des planètes en rapport à l'élèment
+  // Récupération des planètes
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, planets: true }));
@@ -97,21 +97,9 @@ export default function SpeciesDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
-    const selector = () => {
-      const selectedElements: Planet[] = [];
-      const matchedElements = planets.filter(
-        (item) => item.url == state.selectedSpecies?.homeworld,
-      );
-      selectedElements.push(...matchedElements);
-      setState((prevState) => ({ ...prevState, selectedPlanets: selectedElements }));
-    };
     if (!planets.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, planets: false }));
-    }
-  }, [dispatch, planets, state.selectedSpecies]);
-  // Récupération des films en rapport à l'élèment
+  }, [dispatch, planets]);
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -123,21 +111,9 @@ export default function SpeciesDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
-    const selector = () => {
-      const selectedElements: Films[] = [];
-      state.selectedSpecies?.films.forEach((url) => {
-        const matchedElements = films.filter((item) => item.url === url);
-        selectedElements.push(...matchedElements);
-      });
-      setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
-    };
     if (!films.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
-    }
-  }, [dispatch, films, state.selectedSpecies]);
-  // Récupération des personnages en rapport à l'élèment
+  }, [dispatch, films]);
+  // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -149,7 +125,28 @@ export default function SpeciesDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
-    const selector = () => {
+    if (!people.length) fetchItems();
+  }, [dispatch, people]);
+
+  // Logique de tri
+  useEffect(() => {
+    const selectPlanets = () => {
+      const selectedElements: Planet[] = [];
+      const matchedElements = planets.filter(
+        (item) => item.url == state.selectedSpecies?.homeworld,
+      );
+      selectedElements.push(...matchedElements);
+      setState((prevState) => ({ ...prevState, selectedPlanets: selectedElements }));
+    };
+    const selectFilms = () => {
+      const selectedElements: Films[] = [];
+      state.selectedSpecies?.films.forEach((url) => {
+        const matchedElements = films.filter((item) => item.url === url);
+        selectedElements.push(...matchedElements);
+      });
+      setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+    };
+    const selectPeople = () => {
       const selectedElements: People[] = [];
       state.selectedSpecies?.people.forEach((url) => {
         const matchedElements = people.filter((item) => item.url === url);
@@ -157,12 +154,11 @@ export default function SpeciesDetailsPage() {
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
     };
-    if (!people.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
-    }
-  }, [dispatch, people, state.selectedSpecies]);
+
+    selectPlanets();
+    selectFilms();
+    selectPeople();
+  }, [planets, people, species, state.selectedSpecies, films]);
 
   return (
     <div className={style.app}>

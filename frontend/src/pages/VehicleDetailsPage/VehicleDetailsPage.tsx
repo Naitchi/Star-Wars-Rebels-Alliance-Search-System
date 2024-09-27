@@ -77,7 +77,7 @@ export default function VehicleDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     }
   }, [dispatch, navigate, vehicles, id]);
-  // Récupération des personnages en rapport à l'élèment
+  // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -89,21 +89,9 @@ export default function VehicleDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
-    const selector = () => {
-      const selectedElements: People[] = [];
-      state.selectedVehicles?.pilots.forEach((url) => {
-        const matchedElements = people.filter((item) => item.url === url);
-        selectedElements.push(...matchedElements);
-      });
-      setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
-    };
     if (!people.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
-    }
-  }, [dispatch, people, state.selectedVehicles]);
-  // Récupération des films en rapport à l'élèment
+  }, [dispatch, people]);
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -115,7 +103,12 @@ export default function VehicleDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
-    const selector = () => {
+    if (!films.length) fetchItems();
+  }, [dispatch, films]);
+
+  // Logique de tri
+  useEffect(() => {
+    const selectFilms = () => {
       const selectedElements: Films[] = [];
       state.selectedVehicles?.films.forEach((url) => {
         const matchedElements = films.filter((item) => item.url === url);
@@ -123,12 +116,18 @@ export default function VehicleDetailsPage() {
       });
       setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
     };
-    if (!films.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
-    }
-  }, [dispatch, films, state.selectedVehicles]);
+    const selectPeople = () => {
+      const selectedElements: People[] = [];
+      state.selectedVehicles?.pilots.forEach((url) => {
+        const matchedElements = people.filter((item) => item.url === url);
+        selectedElements.push(...matchedElements);
+      });
+      setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+    };
+
+    selectFilms();
+    selectPeople();
+  }, [people, films, state.selectedVehicles]);
 
   return (
     <div className={style.app}>

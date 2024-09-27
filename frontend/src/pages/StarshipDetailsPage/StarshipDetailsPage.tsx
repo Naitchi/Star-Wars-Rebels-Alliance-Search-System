@@ -78,7 +78,7 @@ export default function StarshipDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, starships: false }));
     }
   }, [dispatch, navigate, starships, id]);
-  // Récupération des personnages en rapport à l'élèment
+  // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, people: true }));
@@ -90,21 +90,9 @@ export default function StarshipDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
-    const selector = () => {
-      const selectedElements: People[] = [];
-      state.selectedStarships?.pilots.forEach((url) => {
-        const matchedElements = people.filter((item) => item.url === url);
-        selectedElements.push(...matchedElements);
-      });
-      setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
-    };
     if (!people.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
-    }
-  }, [dispatch, people, state.selectedStarships]);
-  // Récupération des films en rapport à l'élèment
+  }, [dispatch, people]);
+  // Récupération des films
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading((prevState) => ({ ...prevState, films: true }));
@@ -116,7 +104,20 @@ export default function StarshipDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
-    const selector = () => {
+    if (!films.length) fetchItems();
+  }, [dispatch, films]);
+
+  // Logique de tri
+  useEffect(() => {
+    const selectPeople = () => {
+      const selectedElements: People[] = [];
+      state.selectedStarships?.pilots.forEach((url) => {
+        const matchedElements = people.filter((item) => item.url === url);
+        selectedElements.push(...matchedElements);
+      });
+      setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+    };
+    const selectFilms = () => {
       const selectedElements: Films[] = [];
       state.selectedStarships?.films.forEach((url) => {
         const matchedElements = films.filter((item) => item.url === url);
@@ -124,12 +125,10 @@ export default function StarshipDetailsPage() {
       });
       setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
     };
-    if (!films.length) fetchItems();
-    else {
-      selector();
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
-    }
-  }, [dispatch, films, state.selectedStarships]);
+
+    selectPeople();
+    selectFilms();
+  }, [starships, people, state.selectedStarships, films]);
 
   return (
     <div className={style.app}>
