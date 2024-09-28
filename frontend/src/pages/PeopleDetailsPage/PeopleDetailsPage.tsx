@@ -100,7 +100,6 @@ export default function PeopleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     if (!planets.length) fetchItems();
   }, [dispatch, planets]);
@@ -114,7 +113,6 @@ export default function PeopleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     };
     if (!vehicles.length) fetchItems();
   }, [dispatch, vehicles]);
@@ -128,7 +126,6 @@ export default function PeopleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, starships: false }));
     };
     if (!starships.length) fetchItems();
   }, [dispatch, starships]);
@@ -142,7 +139,6 @@ export default function PeopleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     if (!films.length) fetchItems();
   }, [dispatch, films]);
@@ -154,6 +150,7 @@ export default function PeopleDetailsPage() {
         (item) => item.url == state.selectedPeople?.homeworld,
       );
       setState((prevState) => ({ ...prevState, selectedPlanets: matchedElements }));
+      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     const selectVehicles = () => {
       if (state.selectedPeople) {
@@ -163,6 +160,7 @@ export default function PeopleDetailsPage() {
           selectedElements.push(...matchedVehicles);
         });
         setState((prevState) => ({ ...prevState, selectedVehicles: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
       }
     };
     const selectedStarships = () => {
@@ -173,6 +171,7 @@ export default function PeopleDetailsPage() {
           selectedElements.push(...matchedElements);
         });
         setState((prevState) => ({ ...prevState, selectedStarships: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, starships: false }));
       }
     };
     const selectedFilms = () => {
@@ -183,8 +182,10 @@ export default function PeopleDetailsPage() {
           selectedElements.push(...matchedElements);
         });
         setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, films: false }));
       }
     };
+
     selectPlanets();
     selectVehicles();
     selectedStarships();

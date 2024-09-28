@@ -76,7 +76,6 @@ export default function SpeciesDetailsPage() {
       const item: Species = species.filter(
         (item) => item.url == `https://swapi.dev/api/species/${id}/`,
       )[0];
-      console.log(item);
       if (!item) {
         navigate('/NotFound');
       }
@@ -95,7 +94,6 @@ export default function SpeciesDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     if (!planets.length) fetchItems();
   }, [dispatch, planets]);
@@ -109,7 +107,6 @@ export default function SpeciesDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     if (!films.length) fetchItems();
   }, [dispatch, films]);
@@ -123,7 +120,6 @@ export default function SpeciesDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     if (!people.length) fetchItems();
   }, [dispatch, people]);
@@ -137,6 +133,7 @@ export default function SpeciesDetailsPage() {
       );
       selectedElements.push(...matchedElements);
       setState((prevState) => ({ ...prevState, selectedPlanets: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     const selectFilms = () => {
       const selectedElements: Films[] = [];
@@ -145,6 +142,7 @@ export default function SpeciesDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     const selectPeople = () => {
       const selectedElements: People[] = [];
@@ -153,6 +151,7 @@ export default function SpeciesDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
 
     selectPlanets();

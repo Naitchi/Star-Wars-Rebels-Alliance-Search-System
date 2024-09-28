@@ -65,6 +65,7 @@ export default function VehicleDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     };
+
     if (!vehicles.length) fetchItem();
     else {
       const item: Vehicle = vehicles.filter(
@@ -77,6 +78,7 @@ export default function VehicleDetailsPage() {
       setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     }
   }, [dispatch, navigate, vehicles, id]);
+
   // Récupération des personnages
   useEffect(() => {
     const fetchItems = async () => {
@@ -87,7 +89,6 @@ export default function VehicleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     if (!people.length) fetchItems();
   }, [dispatch, people]);
@@ -101,7 +102,6 @@ export default function VehicleDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     if (!films.length) fetchItems();
   }, [dispatch, films]);
@@ -115,6 +115,7 @@ export default function VehicleDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     const selectPeople = () => {
       const selectedElements: People[] = [];
@@ -123,6 +124,7 @@ export default function VehicleDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
 
     selectFilms();

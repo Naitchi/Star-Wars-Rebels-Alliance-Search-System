@@ -88,7 +88,6 @@ export default function StarshipDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     if (!people.length) fetchItems();
   }, [dispatch, people]);
@@ -102,7 +101,6 @@ export default function StarshipDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     if (!films.length) fetchItems();
   }, [dispatch, films]);
@@ -116,6 +114,7 @@ export default function StarshipDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     const selectFilms = () => {
       const selectedElements: Films[] = [];
@@ -124,6 +123,7 @@ export default function StarshipDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
 
     selectPeople();

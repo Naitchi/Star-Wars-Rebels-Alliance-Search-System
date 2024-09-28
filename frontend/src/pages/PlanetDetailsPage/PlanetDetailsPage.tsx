@@ -65,12 +65,12 @@ export default function PlanetDetailsPage() {
       }
       setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
+
     if (!planets.length) fetchItem();
     else {
       const item: Planet = planets.filter(
         (item) => item.url == `https://swapi.dev/api/planets/${id}/`,
       )[0];
-      console.log(item);
       if (!item) {
         navigate('/NotFound');
       }
@@ -88,7 +88,6 @@ export default function PlanetDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
     if (!films.length) fetchItems();
   }, [dispatch, films]);
@@ -102,7 +101,6 @@ export default function PlanetDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     if (!people.length) fetchItems();
   }, [dispatch, people]);
@@ -117,6 +115,7 @@ export default function PlanetDetailsPage() {
           selectedElements.push(...matchedElements);
         });
         setState((prevState) => ({ ...prevState, selectedFilms: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, films: false }));
       }
     };
     const selectPeople = () => {
@@ -126,6 +125,7 @@ export default function PlanetDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
 
     selectFilms();

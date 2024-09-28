@@ -82,9 +82,8 @@ export default function FilmDetailsPage() {
         setState((prevState) => ({ ...prevState, selectedFilms: response }));
       } catch (err) {
         console.log(err);
-      } finally {
-        setIsLoading((prevState) => ({ ...prevState, films: false }));
       }
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
     };
 
     if (!films.length) {
@@ -96,6 +95,7 @@ export default function FilmDetailsPage() {
         return;
       }
       setState((prevState) => ({ ...prevState, selectedFilms: item }));
+      setIsLoading((prevState) => ({ ...prevState, films: false }));
     }
   }, [dispatch, navigate, films, id]);
   // Récupération des planètes
@@ -108,7 +108,6 @@ export default function FilmDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     if (!planets.length) fetchItems();
   }, [dispatch, planets]);
@@ -122,7 +121,6 @@ export default function FilmDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
     };
     if (!vehicles.length) fetchItems();
   }, [dispatch, vehicles]);
@@ -136,7 +134,6 @@ export default function FilmDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, starships: false }));
     };
     if (!starships.length) fetchItems();
   }, [dispatch, starships]);
@@ -150,7 +147,6 @@ export default function FilmDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     if (!people.length) fetchItems();
   }, [dispatch, people]);
@@ -164,7 +160,6 @@ export default function FilmDetailsPage() {
       } catch (err) {
         console.log(err);
       }
-      setIsLoading((prevState) => ({ ...prevState, species: false }));
     };
     if (!species.length) fetchItems();
   }, [dispatch, species]);
@@ -177,14 +172,15 @@ export default function FilmDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPlanets: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, planets: false }));
     };
     const selectVehicles = () => {
       if (state.selectedFilms) {
         const selectedElements: Vehicle[] = state.selectedFilms.vehicles
           .map((url) => vehicles.find((item) => item.url === url))
           .filter((vehicle): vehicle is Vehicle => vehicle !== undefined); // Filtre les résultats non définis
-
         setState((prevState) => ({ ...prevState, selectedVehicles: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, vehicles: false }));
       }
     };
     const selectStarships = () => {
@@ -195,6 +191,7 @@ export default function FilmDetailsPage() {
           selectedElements.push(...matchedElements);
         });
         setState((prevState) => ({ ...prevState, selectedStarships: selectedElements }));
+        setIsLoading((prevState) => ({ ...prevState, starships: false }));
       }
     };
     const selectPeople = () => {
@@ -204,6 +201,7 @@ export default function FilmDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedPeople: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, people: false }));
     };
     const selectSpecies = () => {
       const selectedElements: Species[] = [];
@@ -212,6 +210,7 @@ export default function FilmDetailsPage() {
         selectedElements.push(...matchedElements);
       });
       setState((prevState) => ({ ...prevState, selectedSpecies: selectedElements }));
+      setIsLoading((prevState) => ({ ...prevState, species: false }));
     };
 
     selectPlanets();
