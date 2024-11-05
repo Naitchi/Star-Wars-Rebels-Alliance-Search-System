@@ -14,7 +14,10 @@ const init = async (): Promise<void> => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['http://localhost:5173'], // Autorise le frontend
+        origin: [
+          'http://localhost:5173',
+          'https://star-wars-rebels-alliance-search-system-frontend.vercel.app/',
+        ], // Autorise le frontend
         credentials: true,
       },
     },
