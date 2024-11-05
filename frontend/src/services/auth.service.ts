@@ -3,7 +3,7 @@ import { jwtDecode, JwtPayload } from 'jwt-decode';
 
 // Fonction pour faire la requête pour le login
 export async function login(login: { username: string; password: string }) {
-  const url: string = `http://localhost:3000/login`;
+  const url: string = `https://star-wars-rebels-alliance-search-system-backend.vercel.app/login`;
   try {
     const response: AxiosResponse = await axios.post(url, login);
     if (response.data.token) {

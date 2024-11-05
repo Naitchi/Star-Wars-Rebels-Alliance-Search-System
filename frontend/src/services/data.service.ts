@@ -10,7 +10,7 @@ export async function getAll(name: string | undefined): Promise<Items | undefine
     console.error('Token expiered');
     window.location.href = '/';
   }
-  const url: string = `http://localhost:3000/categories/${name}`;
+  const url: string = `https://star-wars-rebels-alliance-search-system-backend.vercel.app/categories/${name}`;
   const headers = {
     Authorization: `Bearer ${token}`,
   };
@@ -34,7 +34,7 @@ export async function getOneElement(
     window.location.href = '/';
   }
 
-  const url = `http://localhost:3000/category/${name}/${id}`;
+  const url = `https://star-wars-rebels-alliance-search-system-backend.vercel.app/category/${name}/${id}`;
   const headers = {
     Authorization: `Bearer ${token}`,
   };
